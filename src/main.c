@@ -19,10 +19,13 @@
 
 #define USB_DEVICE_VID 						0x0781
 #define USB_DEVICE_PID						0x5572
+
+//general values for Descriptor of USB flash drive
 #define B_CONFIGURATION_VALUE	 			1
 #define BULK_ENDPOINT_IN 					0x81 		//default Endpoint for receiving for mass storage
 #define BULK_ENDPOINT_OUT 					0x02		//default Endpoint for sending for mass storage
-
+#define OUT_TIMEOUT							1000
+#define IN_TIMEOUT							1000
 
 static struct libusb_device_handle *devh = NULL;
 int active_kernel_driver=0;
@@ -203,12 +206,12 @@ int flash_drive_deinit()
 }
 */
 
-int flash_drive_send_data(unsigned char *data_ptr, int no_of_bytes, uint16_t timeout)
+int flash_drive_send_data(unsigned char *data_ptr, int no_of_bytes)
 {
 	int r;
 	int actual_length=2;
 
-	r=libusb_bulk_transfer(devh, BULK_ENDPOINT_OUT, data_ptr, no_of_bytes, &actual_length, timeout);	//Endpoint No:1 Data: data_ptr
+	r=libusb_bulk_transfer(devh, BULK_ENDPOINT_OUT, data_ptr, no_of_bytes, &actual_length, OUT_TIMEOUT);	//Endpoint No:1 Data: data_ptr
 	if(r<0)											//length :2 *actual_length=2
 	{												//Timeout=0
 		printf("\nSend Failure.	%d\n",r);
@@ -224,7 +227,7 @@ int flash_drive_send_data(unsigned char *data_ptr, int no_of_bytes, uint16_t tim
 	return 0;
 }
 
-int flash_drive_receive_data(unsigned char *data_ptr, int no_of_bytes, int *no_of_actually_transferred_bytes, uint16_t timeout)
+int flash_drive_receive_data(unsigned char *data_ptr, int no_of_bytes, int *no_of_actually_transferred_bytes)
 {
 	int r;
 	r=libusb_clear_halt(devh, BULK_ENDPOINT_IN);
@@ -238,7 +241,7 @@ int flash_drive_receive_data(unsigned char *data_ptr, int no_of_bytes, int *no_o
 	{
 		printf("\n clear halt the BULK_ENDPOINT_IN.	%d\n",r);
 
-		r=libusb_bulk_transfer(devh, BULK_ENDPOINT_IN, data_ptr, no_of_bytes, no_of_actually_transferred_bytes, timeout);	
+		r=libusb_bulk_transfer(devh, BULK_ENDPOINT_IN, data_ptr, no_of_bytes, no_of_actually_transferred_bytes, IN_TIMEOUT);	
 	
 		if(r<0)	
 		{												
