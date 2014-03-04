@@ -5,10 +5,13 @@
 #include <stdio.h>
 #include <sys/types.h>
 #include <malloc.h>
+#include <unistd.h>
 
 #include "libusb.h"
 #include "pff.h"
-#include "scsi.h"
+#include "MassStoreCommands.h"
+
+//#include "scsi.h"
 
 #define USB_DETACH_KERNEL_DRIVER_ERROR	1
 #define USB_INIT_ERROR					1
@@ -18,7 +21,7 @@
 #define USB_OPEN_ERROR					1
 
 #define USB_DEVICE_VID 						0x0781
-#define USB_DEVICE_PID						0x5572
+#define USB_DEVICE_PID						0x5151
 
 //general values for Descriptor of USB flash drive
 #define B_CONFIGURATION_VALUE	 			1
@@ -147,7 +150,7 @@ int flash_drive_init(void)
 		}
 		
 	}
-
+/*
 	// configuration set to B_CONFIGURATION_VALUE
 	r=libusb_set_configuration(devh,B_CONFIGURATION_VALUE);
 	if(r<0)
@@ -158,7 +161,7 @@ int flash_drive_init(void)
 	else
 	{
 		printf("\nConfigured.\n");
-	}
+	}*/
 	return 0;
 }
 
@@ -227,33 +230,37 @@ int flash_drive_send_data(unsigned char *data_ptr, int no_of_bytes)
 	return 0;
 }
 
-int flash_drive_receive_data(unsigned char *data_ptr, int no_of_bytes, int *no_of_actually_transferred_bytes)
+int flash_drive_receive_data(unsigned char *data_ptr, int no_of_bytes, int *no_of_actually_received_bytes)
 {
 	int r;
-	r=libusb_clear_halt(devh, BULK_ENDPOINT_IN);
-	if(r<0)	
-	{												
-		printf("\nUnable to clear halt the BULK_ENDPOINT_IN.	%d\n",r);
-		return r;
-	}
+	int retry=5;
 
-	else
-	{
-		printf("\n clear halt the BULK_ENDPOINT_IN.	%d\n",r);
-
-		r=libusb_bulk_transfer(devh, BULK_ENDPOINT_IN, data_ptr, no_of_bytes, no_of_actually_transferred_bytes, IN_TIMEOUT);	
-	
-		if(r<0)	
-		{												
-			printf("\nReceive Failure.	%d\n",r);
-			return r;
+	while(retry)
+		{
+			usleep(1000000);
+			printf("Retry %d",retry);
+			r=libusb_bulk_transfer(devh, BULK_ENDPOINT_IN, data_ptr, no_of_bytes, no_of_actually_received_bytes, IN_TIMEOUT);	
+			if(r==-9)
+			{
+				retry--;
+				printf("PIPE ERROR\n");
+				continue;
+			}
+			else if(r<0)	
+			{	
+				retry--;											
+				printf("\nReceive Failure.	Error:%d\tReceivedBytes:%d\tActuallyReceivedBytes:%d\n",r,no_of_bytes,*no_of_actually_received_bytes);
+				continue;
+			}
+			else
+			{
+				printf("\nReceive Complete. \tReceivedBytes:%d\tActuallyReceivedBytes:%d\n",no_of_bytes,*no_of_actually_received_bytes);
+				break;	
+			}
+			
 		}
-	
-		else
-		printf("\nReceive Complete.\n");
-	}
 
-	return 0;
+	return r;
 }
 
 /*-----------------------------------------------------------------------*/
@@ -264,11 +271,23 @@ int main (void)
 {
 
 	int r;
-	
+	SCSI_Inquiry_Response_t req_sense_res;
 
 	r=flash_drive_init();
 	if(r==0)
 	{
+		// reset the device
+		r=libusb_reset_device(devh);
+		if(r<0)
+		{
+			printf("\nCouldnot reset. %d\n",r);
+			return -23;
+		}
+		else
+		{
+			printf("\nRESET.\n");
+		}
+		
 		// claim the interface 0 for data transfer
 		r=libusb_claim_interface(devh, 0);
 		if(r<0)
@@ -281,15 +300,23 @@ int main (void)
 
 		// Data Transfer function
 //		flash_drive_transfer_data(devh);
-		r=inquiry(0,0,36,0);
+		r=MassStore_Inquiry(0, &req_sense_res );
 		if(r<0)
 		{
-			printf("Error Inquiry\n");
+			printf("MassStore_RequestSense Fail\n");
 		}
 		else
 		{
-			printf("Inquiry successful.\n");
+			printf("MassStore_RequestSense successful.\n");
 		}
+		int i;
+		printf("\n Vendor::");
+		for (i=0;i<8;i++)
+		printf("%c", req_sense_res.VendorID[i]);
+
+		printf("\n Product::");
+		for (i=0;i<16;i++)
+		printf("%c", req_sense_res.ProductID[i]);
 
 		// release the interface zero if claimed.
 		r=libusb_release_interface(devh,0);

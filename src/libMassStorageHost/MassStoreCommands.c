@@ -50,7 +50,6 @@
 #define  INCLUDE_FROM_MASSSTORE_COMMANDS_C
 #include "MassStoreCommands.h"
 
-#include "libusb.h"
 #include "main.h"
 
 /** Current Tag value used in issued CBWs to the device. This is automatically incremented
@@ -85,6 +84,20 @@ static uint8_t MassStore_SendCommand(CommandBlockWrapper_t* SCSICommandBlock, vo
 	// if ((ErrorCode = Pipe_Write_Stream_LE(SCSICommandBlock, sizeof(CommandBlockWrapper_t))) != PIPE_RWSTREAM_NoError)
 	//   return ErrorCode;
 
+	printf("Size of CommandBlockWrapper_t= %d\n",sizeof(CommandBlockWrapper_t));
+	
+	/* Testing for the SCSI commands Block Wrapper and printing the Command Block Wrapper	
+	 int i;
+	unsigned char *command;
+	int length_command=sizeof(CommandBlockWrapper_t);
+	command=(unsigned char *)SCSICommandBlock;
+
+	for(i=0; i<length_command;i++)
+	{
+		printf("%x\t%c\n",*command,*command);
+		command++;
+	}
+	*/
 	ErrorCode = flash_drive_send_data((unsigned char *)SCSICommandBlock, sizeof(CommandBlockWrapper_t));
 	if(ErrorCode<0)
 		return ErrorCode;
@@ -227,7 +240,7 @@ static uint8_t MassStore_SendReceiveData(CommandBlockWrapper_t* SCSICommandBlock
 		// if ((ErrorCode = Pipe_Write_Stream_LE(BufferPtr, BytesRem)) != PIPE_RWSTREAM_NoError)
 		//   return ErrorCode;
 		
-		ErrorCode = flash_drive_send_data(BufferPtr, BytesRem)
+		ErrorCode = flash_drive_send_data(BufferPtr, BytesRem);
 		if(ErrorCode<0)		
 			return ErrorCode;
 
@@ -271,7 +284,7 @@ static uint8_t MassStore_GetReturnedStatus(CommandStatusWrapper_t* SCSICommandSt
 	// if ((ErrorCode = Pipe_Read_Stream_LE(SCSICommandStatus, sizeof(CommandStatusWrapper_t))) != PIPE_RWSTREAM_NoError)
 	//   return ErrorCode;
 	
-	ErrorCode = flash_drive_receive_data(SCSICommandStatus,  sizeof(CommandStatusWrapper_t), &actual_no_received);
+	ErrorCode = flash_drive_receive_data((unsigned char *)SCSICommandStatus, sizeof(CommandStatusWrapper_t) , &actual_no_received);
 	if(ErrorCode==0)
 	{
 		// Clear the data ready for next reception
@@ -389,7 +402,8 @@ uint8_t MassStore_Inquiry(const uint8_t LUNIndex, SCSI_Inquiry_Response_t* const
 					0x00                    // Unused (control)
 				}
 		};
-	
+	printf("size of SCSI_Inquiry_Response_t: %d\n",sizeof(SCSI_Inquiry_Response_t));
+
 	CommandStatusWrapper_t SCSICommandStatus;
 
 	/* Send the command and any data to the attached device */
@@ -452,7 +466,7 @@ uint8_t MassStore_RequestSense(const uint8_t LUNIndex, SCSI_Request_Sense_Respon
 	}
 	
 	/* Retrieve status information from the attached device */
-	if ((ErrorCode = MassStore_GetReturnedStatus(&SCSICommandStatus)) != PIPE_RWSTREAM_NoError)
+	if ((ErrorCode = MassStore_GetReturnedStatus(&SCSICommandStatus)) != 0)
 	{
 		// Pipe_Freeze();
 		return ErrorCode;
@@ -595,7 +609,7 @@ uint8_t MassStore_WriteDeviceBlock(const uint8_t LUNIndex, const uint32_t BlockA
  */
 uint8_t MassStore_TestUnitReady(const uint8_t LUNIndex)
 {
-	uint8_t ErrorCode = PIPE_RWSTREAM_NoError;	
+	uint8_t ErrorCode;	
 
 	/* Create a CBW with a SCSI command to issue TEST UNIT READY command */
 	CommandBlockWrapper_t SCSICommandBlock = (CommandBlockWrapper_t)

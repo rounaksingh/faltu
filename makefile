@@ -1,13 +1,14 @@
 # Generic Makefile for compiling a simple executable.
 #
-CC := gcc
 SRCDIR = src
-BUILDDIR = build
+OBJDIR = build
+
 TARGET := main
 SRCEXT := c
+
 #SOURCES := $(shell find $(SRCDIR) -type f -name *.$(SRCEXT))
 #
-SOURCES = main libPFF/diskio libPFF/pff libMassStorageHost/MassStoreCommands
+SRC = main.c libPFF/diskio.c libPFF/pff.c libMassStorageHost/MassStoreCommands.c
 
 EXTRAINCDIRS = src src/libMassStorageHost src/libPFF
 
@@ -21,20 +22,23 @@ CFLAGS += $(patsubst %,-I%,$(EXTRAINCDIRS))
 LDFLAGS = -Wall -L/usr/local/lib -lusb-1.0
 LDFLAGS += -Wl,--gc-sections
 
-OBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.o))
-DEPS := $(OBJECTS:.o=.deps)
+#OBJECTS = $(patsubst %,$(OBJDIR)/%,$(SOURCES:.$(SRCEXT)=.o))
+OBJ = $(SRC:%.c=$(OBJDIR)/%.o)
+DEPS = $(OBJECTS:.o=.deps)
+CC = gcc
 
-$(TARGET): $(OBJECTS)
+$(TARGET): $(OBJ)
 	@echo " Linking...";
 	$(CC) $^ -o $(TARGET) $(LDFLAGS)
 
-$(BUILDDIR)/%.o: $(SRCDIR)/%.$(SRCEXT)
-	@mkdir -p $(BUILDDIR)
-# @echo " CC $<"; 
+$(OBJDIR)/%.o: $(SRCDIR)/%.$(SRCEXT)
+	@mkdir -p $(OBJDIR) $(OBJDIR)/libPFF $(OBJDIR)/libMassStorageHost
+#	@echo " CC $<"; 
 	$(CC) $(CFLAGS) -MD -MF $(@:.o=.deps) -c -o $@ $<
 
 clean:
-	@echo " Cleaning..."; $(RM) -r $(BUILDDIR) $(TARGET)
+	@echo " Cleaning..."; 
+	$(RM) -r $(OBJDIR) $(TARGET)
 
 -include $(DEPS)
 

@@ -37,14 +37,21 @@
 #define _MASS_STORE_COMMANDS_H_
 
 	/* Includes: */
-		#include <avr/io.h>
+		// #include <avr/io.h>
 
-		#include "MassStorageHost.h"
+		// #include "MassStorageHost.h"
 		#include "SCSI_Codes.h"
+ 		#include <inttypes.h>
+ 		#include <stdio.h>
+ 		#include "stdbool.h"
 
-		#include <LUFA/Drivers/USB/USB.h>
+ 		#include <stddef.h>
+		// #include <LUFA/Drivers/USB/USB.h>
 
 	/* Macros: */
+ 	// value for NULL
+ 	//#define NULL 0
+
 		/** Class specific request to reset the Mass Storage interface of the attached device */
 		#define REQ_MassStorageReset                0xFF
 
@@ -88,7 +95,7 @@
 			uint8_t  LUN; /**< Logical Unit Number the CBW is addressed to in the device */
 			uint8_t  SCSICommandLength; /**< Length of the SCSI command in the CBW */
 			uint8_t  SCSICommandData[16]; /**< SCSI command to issue to the device */
-		} CommandBlockWrapper_t;
+		} __attribute__ ((packed)) CommandBlockWrapper_t;
 		
 		/** Type define for a Mass Storage class Command Status Wrapper, used to wrap SCSI
 		 *  responses for transport over the USB bulk endpoints from the device.
@@ -99,7 +106,7 @@
 			uint32_t Tag; /**< Current CBW tag, to positively associate a CBW with a CSW */
 			uint32_t DataTransferResidue; /**< Length of data not transferred */
 			uint8_t  Status; /**< Command status, a value from the MassStorageHost_CommandStatusCodes_t enum */
-		} CommandStatusWrapper_t;
+		} __attribute__ ((packed)) CommandStatusWrapper_t;
 		
 		/** Type define for a SCSI Sense structure. Structures of this type are filled out by the
 		 *  device via the MassStore_RequestSense() function, indicating the current sense data of the
@@ -125,7 +132,7 @@
 			uint8_t      AdditionalSenseQualifier;
 			uint8_t      FieldReplaceableUnitCode;
 			uint8_t      SenseKeySpecific[3];
-		} SCSI_Request_Sense_Response_t;
+		} __attribute__ ((packed)) SCSI_Request_Sense_Response_t;
 
 		/** Type define for a SCSI Inquiry structure. Structures of this type are filled out by the
 		 *  device via the MassStore_Inquiry() function, retrieving the attached device's information.
@@ -162,7 +169,7 @@
 			uint8_t      VendorID[8];
 			uint8_t      ProductID[16];
 			uint8_t      RevisionID[4];
-		} SCSI_Inquiry_Response_t;
+		} __attribute__ ((packed)) SCSI_Inquiry_Response_t;
 		
 		/** SCSI capacity structure, to hold the total capacity of the device in both the number
 		 *  of blocks in the current LUN, and the size of each block. This structure is filled by
@@ -172,7 +179,7 @@
 		{
 			uint32_t Blocks; /**< Number of blocks in the addressed LUN of the device */
 			uint32_t BlockSize; /**< Number of bytes in each block in the addressed LUN */
-		} SCSI_Capacity_t;
+		} __attribute__ ((packed)) SCSI_Capacity_t;
 
 	/* Enums: */
 		/** CSW status return codes, indicating the overall status of the issued CBW */
@@ -187,22 +194,19 @@
 		#if defined(INCLUDE_FROM_MASSSTORE_COMMANDS_C)
 			static uint8_t MassStore_SendCommand(CommandBlockWrapper_t* SCSICommandBlock, void* BufferPtr);
 			static uint8_t MassStore_WaitForDataReceived(void);
-			static uint8_t MassStore_SendReceiveData(CommandBlockWrapper_t* SCSICommandBlock, void* BufferPtr) ATTR_NON_NULL_PTR_ARG(1);
-			static uint8_t MassStore_GetReturnedStatus(CommandStatusWrapper_t* SCSICommandStatus) ATTR_NON_NULL_PTR_ARG(1);
+			static uint8_t MassStore_SendReceiveData(CommandBlockWrapper_t* SCSICommandBlock, void* BufferPtr); // ATTR_NON_NULL_PTR_ARG(1);
+			static uint8_t MassStore_GetReturnedStatus(CommandStatusWrapper_t* SCSICommandStatus);  // ATTR_NON_NULL_PTR_ARG(1);
 		#endif
 		
 		uint8_t MassStore_MassStorageReset(void);
 		uint8_t MassStore_GetMaxLUN(uint8_t* const MaxLUNIndex);
-		uint8_t MassStore_RequestSense(const uint8_t LUNIndex, SCSI_Request_Sense_Response_t* const SensePtr)
-		                               ATTR_NON_NULL_PTR_ARG(2);
-		uint8_t MassStore_Inquiry(const uint8_t LUNIndex, SCSI_Inquiry_Response_t* const InquiryPtr)
-		                               ATTR_NON_NULL_PTR_ARG(2);
+		uint8_t MassStore_RequestSense(const uint8_t LUNIndex, SCSI_Request_Sense_Response_t* const SensePtr);	//ATTR_NON_NULL_PTR_ARG(2);
+		uint8_t MassStore_Inquiry(const uint8_t LUNIndex, SCSI_Inquiry_Response_t* const InquiryPtr);	//ATTR_NON_NULL_PTR_ARG(2);
 		uint8_t MassStore_ReadDeviceBlock(const uint8_t LUNIndex, const uint32_t BlockAddress,
-		                                  const uint8_t Blocks, const uint16_t BlockSize, void* BufferPtr) ATTR_NON_NULL_PTR_ARG(5);
+		                                  const uint8_t Blocks, const uint16_t BlockSize, void* BufferPtr); // ATTR_NON_NULL_PTR_ARG(5);
 		uint8_t MassStore_WriteDeviceBlock(const uint8_t LUNIndex, const uint32_t BlockAddress,
-                                           const uint8_t Blocks, const uint16_t BlockSize, void* BufferPtr) ATTR_NON_NULL_PTR_ARG(5);
-		uint8_t MassStore_ReadCapacity(const uint8_t LUNIndex, SCSI_Capacity_t* const CapacityPtr)
-		                               ATTR_NON_NULL_PTR_ARG(2);
+                                           const uint8_t Blocks, const uint16_t BlockSize, void* BufferPtr); // ATTR_NON_NULL_PTR_ARG(5);
+		uint8_t MassStore_ReadCapacity(const uint8_t LUNIndex, SCSI_Capacity_t* const CapacityPtr); //ATTR_NON_NULL_PTR_ARG(2);
 		uint8_t MassStore_TestUnitReady(const uint8_t LUNIndex);
 		uint8_t MassStore_PreventAllowMediumRemoval(const uint8_t LUNIndex, const bool PreventRemoval);
 
