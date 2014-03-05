@@ -311,6 +311,18 @@ int main (void)
 		{
 			printf("MassStore_RequestSense successful.\n");
 			print_struct_INQ(&req_sense_res);
+			
+			// Test UNIT Ready
+			r=MassStore_TestUnitReady(0);
+			if(r<0)
+			{
+				printf("Mass Storage Not Ready. Do a Request Sense.\n");
+			}
+			else
+			{
+				printf("Mass Storage Ready.\n");
+			}
+
 		}
 
 		// release the interface zero if claimed.

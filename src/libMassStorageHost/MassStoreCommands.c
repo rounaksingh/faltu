@@ -225,7 +225,7 @@ static uint8_t MassStore_SendReceiveData(CommandBlockWrapper_t* SCSICommandBlock
 		//   return ErrorCode;
 
 		ErrorCode = flash_drive_receive_data(BufferPtr, BytesRem, &actual_no_received);
-		if(ErrorCode<0)
+		if(ErrorCode<0 && (BytesRem==actual_no_received))
 			return ErrorCode;
 
 		// Acknowledge the packet
@@ -286,7 +286,7 @@ static uint8_t MassStore_GetReturnedStatus(CommandStatusWrapper_t* SCSICommandSt
 	//   return ErrorCode;
 	
 	ErrorCode = flash_drive_receive_data((unsigned char *)SCSICommandStatus, sizeof(CommandStatusWrapper_t) , &actual_no_received);
-	if(ErrorCode==0)
+	if(ErrorCode==0 && (actual_no_received==sizeof(CommandStatusWrapper_t)))
 	{
 		// Clear the data ready for next reception
 		// Pipe_ClearIN();
