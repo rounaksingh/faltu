@@ -8,7 +8,7 @@ SRCEXT := c
 
 #SOURCES := $(shell find $(SRCDIR) -type f -name *.$(SRCEXT))
 #
-SRC = main.c libPFF/diskio.c libPFF/pff.c libMassStorageHost/MassStoreCommands.c
+SRC = main.c libPFF/diskio.c libPFF/pff.c libMassStorageHost/MassStoreCommands.c libMassStorageHost/print_struct.c
 
 EXTRAINCDIRS = src src/libMassStorageHost src/libPFF
 

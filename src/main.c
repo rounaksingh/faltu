@@ -56,13 +56,7 @@ DWORD get_fattime (void)
 			| ((DWORD)0 >> 1);
 }
 
-void print_hex_ascii(char *buf, int no_of_char)
-{
-	int i;
-	for (i=0;i<0x10;i++);
-		
-	// for(i=0;i<)
-}
+
 /***********************************************************************************************/
 /*LIBUSB related functions*/
 
@@ -331,7 +325,6 @@ int main (void)
 		
 		//Is device is removable
 		printf("\nRemovable: %X", req_sense_res.Removable);
-
 
 		// release the interface zero if claimed.
 		r=libusb_release_interface(devh,0);

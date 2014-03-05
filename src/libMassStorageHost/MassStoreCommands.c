@@ -51,6 +51,7 @@
 #include "MassStoreCommands.h"
 
 #include "main.h"
+#include "print_struct.h"
 
 /** Current Tag value used in issued CBWs to the device. This is automatically incremented
  *  each time a command is sent, and is not externally accessible.
@@ -402,7 +403,10 @@ uint8_t MassStore_Inquiry(const uint8_t LUNIndex, SCSI_Inquiry_Response_t* const
 					0x00                    // Unused (control)
 				}
 		};
-	printf("size of SCSI_Inquiry_Response_t: %d\n",sizeof(SCSI_Inquiry_Response_t));
+	// printf("size of SCSI_Inquiry_Response_t: %d\n",sizeof(SCSI_Inquiry_Response_t));
+	
+	print_hex_ascii((unsigned char *)&SCSICommandBlock,31);
+	print_struct_CBW(&SCSICommandBlock);
 
 	CommandStatusWrapper_t SCSICommandStatus;
 
@@ -419,6 +423,9 @@ uint8_t MassStore_Inquiry(const uint8_t LUNIndex, SCSI_Inquiry_Response_t* const
 		// Pipe_Freeze();
 		return ErrorCode;
 	}
+
+	// 
+	print_struct_CSW(&SCSICommandStatus);
 
 	// on success it returns 0 
 	// on error returns error code
