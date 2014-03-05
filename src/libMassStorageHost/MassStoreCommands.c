@@ -405,7 +405,7 @@ uint8_t MassStore_Inquiry(const uint8_t LUNIndex, SCSI_Inquiry_Response_t* const
 		};
 	// printf("size of SCSI_Inquiry_Response_t: %d\n",sizeof(SCSI_Inquiry_Response_t));
 	
-	print_hex_ascii((unsigned char *)&SCSICommandBlock,31);
+	// print_hex_ascii((unsigned char *)&SCSICommandBlock,31);
 	print_struct_CBW(&SCSICommandBlock);
 
 	CommandStatusWrapper_t SCSICommandStatus;

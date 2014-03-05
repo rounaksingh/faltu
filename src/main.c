@@ -10,6 +10,7 @@
 #include "libusb.h"
 #include "pff.h"
 #include "MassStoreCommands.h"
+#include "print_struct.h"
 
 //#include "scsi.h"
 
@@ -309,22 +310,8 @@ int main (void)
 		else
 		{
 			printf("MassStore_RequestSense successful.\n");
+			print_struct_INQ(&req_sense_res);
 		}
-		int i;
-		printf("\n Vendor::");
-		for (i=0;i<8;i++)
-		printf("%c", req_sense_res.VendorID[i]);
-
-		printf("\n Product::");
-		for (i=0;i<16;i++)
-		printf("%c", req_sense_res.ProductID[i]);
-
-		//To identify which SCSI commands the flash drive supports
-		printf("\nPeripheral Qualifier: %X", req_sense_res.PeripheralQualifier);
-		printf("\nVersion: %X", req_sense_res.Version);
-		
-		//Is device is removable
-		printf("\nRemovable: %X", req_sense_res.Removable);
 
 		// release the interface zero if claimed.
 		r=libusb_release_interface(devh,0);
