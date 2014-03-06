@@ -152,7 +152,9 @@ int flash_drive_init(void)
 		}
 		
 	}
-/*
+/*  // As per suggestion from Alan Stern from libusb mailing list
+	// To see the suugestion 
+	// http://libusb.6.n5.nabble.com/libusb-bulk-transfer-error-9-Pipe-Halt-at-EndPoint-0x81-while-receiving-data-from-usb-flash-drive-tt5712940.html#a5712943
 	// configuration set to B_CONFIGURATION_VALUE
 	r=libusb_set_configuration(devh,B_CONFIGURATION_VALUE);
 	if(r<0)
@@ -274,6 +276,7 @@ int main (void)
 
 	int r, counter;
 	SCSI_Inquiry_Response_t req_sense_res;
+	SCSI_Capacity_t capacity;
 
 	r=flash_drive_init();
 	if(r==0)
@@ -312,7 +315,7 @@ int main (void)
 			printf("MassStore_RequestSense successful.\n");
 			print_struct_INQ(&req_sense_res);
 			
-			for(counter=0; counter<=10000;counter++)
+			for(counter=0; counter<=1;counter++)
 			{
 				// Test UNIT Ready
 				r=MassStore_TestUnitReady(0);
@@ -329,6 +332,20 @@ int main (void)
 				usleep(2000000);
 			}
 			
+			printf("\nReading Capacity of Mass Storage device (LUN=0):\n");
+			r=MassStore_ReadCapacity(0, &capacity);
+			if(r<0)
+			{
+				printf("Mass Storage Read Capacity failed.\n");
+			}
+			else
+			{
+				printf("\nMass Storage Read Capacity success.\n");
+				printf("No of Blocks: 0x%04X, %d\n",capacity.Blocks, capacity.Blocks);
+				printf("BlockSize: 0x%04X, %d bytes\n",capacity.BlockSize, capacity.BlockSize);
+			}
+
+
 		}
 
 		// release the interface zero if claimed.
