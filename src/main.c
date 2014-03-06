@@ -6,7 +6,7 @@
 #include <sys/types.h>
 #include <malloc.h>
 #include <unistd.h>
-
+#include "main.h"
 #include "libusb.h"
 #include "pff.h"
 #include "MassStoreCommands.h"
@@ -31,7 +31,7 @@
 #define OUT_TIMEOUT							1000
 #define IN_TIMEOUT							1000
 
-static struct libusb_device_handle *devh = NULL;
+struct libusb_device_handle *devh = NULL;
 int active_kernel_driver=0;
 
 /*Functions for pff*/
@@ -272,7 +272,7 @@ int flash_drive_receive_data(unsigned char *data_ptr, int no_of_bytes, int *no_o
 int main (void)
 {
 
-	int r;
+	int r, counter;
 	SCSI_Inquiry_Response_t req_sense_res;
 
 	r=flash_drive_init();
@@ -312,17 +312,23 @@ int main (void)
 			printf("MassStore_RequestSense successful.\n");
 			print_struct_INQ(&req_sense_res);
 			
-			// Test UNIT Ready
-			r=MassStore_TestUnitReady(0);
-			if(r<0)
+			for(counter=0; counter<=10000;counter++)
 			{
-				printf("Mass Storage Not Ready. Do a Request Sense.\n");
-			}
-			else
-			{
-				printf("Mass Storage Ready.\n");
-			}
+				// Test UNIT Ready
+				r=MassStore_TestUnitReady(0);
+				if(r<0)
+				{
+					printf("Mass Storage Not Ready. Do a Request Sense.\n");
+				}
+				else
+				{
+					printf("Mass Storage Ready.\n");
 
+				}
+
+				usleep(2000000);
+			}
+			
 		}
 
 		// release the interface zero if claimed.
