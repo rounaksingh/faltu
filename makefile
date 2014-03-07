@@ -16,6 +16,8 @@ SRC = main.c libPFF/diskio.c libPFF/pff.c libMassStorageHost/MassStoreCommands.c
 
 EXTRAINCDIRS = src src/libMassStorageHost src/libPFF
 
+LIBUSB_DIR = /usr/local/lib
+
 #
 CFLAGS = -g -Wall -Os
 CFLAGS += -ffunction-sections
@@ -23,7 +25,7 @@ CFLAGS += -fdata-sections
 CFLAGS += $(patsubst %,-I%,$(EXTRAINCDIRS))
 
 #
-LDFLAGS = -Wall -L/usr/local/lib -lusb-1.0
+LDFLAGS = -Wall -L$(LIBUSB_DIR) -lusb-1.0
 LDFLAGS += -Wl,--gc-sections
 
 #OBJECTS = $(patsubst %,$(OBJDIR)/%,$(SOURCES:.$(SRCEXT)=.o))
