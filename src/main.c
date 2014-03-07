@@ -14,6 +14,12 @@
 #include "MassStoreCommands.h"
 #include "print_struct.h"
 
+#ifndef __GNUC__
+#error 	"\n\nError:\nThe program is compatiable with only GCC compiler as program is having some gcc-specific attribute flags."\
+		"If there is urgent need to compiler this program is another compiler, "\
+		"please find a way to make compiler neglect the struct padding and alignment.\n\n"
+#endif
+
 #define USB_DETACH_KERNEL_DRIVER_ERROR	1
 #define USB_INIT_ERROR					1
 #define USB_CLAIM_INTERFACE_ERROR		1
