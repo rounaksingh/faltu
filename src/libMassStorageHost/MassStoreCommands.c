@@ -511,7 +511,7 @@ uint8_t MassStore_RequestSense(const uint8_t LUNIndex, SCSI_Request_Sense_Respon
  *
  *  \param[in] LUNIndex      Index of the LUN inside the device the command is being addressed to
  *  \param[in] BlockAddress  Start block address to read from
- *  \param[in] Blocks        Number of blocks to read from the device
+ *  \param[in] Blocks        Number of blocks to read from the device (function can read only 256 sectors at a time)
  *  \param[in] BlockSize     Size in bytes of each block to read
  *  \param[out] BufferPtr    Pointer to the buffer where the read data is to be written to
  *

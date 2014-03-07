@@ -14,28 +14,12 @@
 #include "MassStoreCommands.h"
 #include "print_struct.h"
 
+// check for gcc compiler
 #ifndef __GNUC__
 #error 	"\n\nError:\nThe program is compatiable with only GCC compiler as program is having some gcc-specific attribute flags."\
 		"If there is urgent need to compiler this program is another compiler, "\
 		"please find a way to make compiler neglect the struct padding and alignment.\n\n"
 #endif
-
-#define USB_DETACH_KERNEL_DRIVER_ERROR	1
-#define USB_INIT_ERROR					1
-#define USB_CLAIM_INTERFACE_ERROR		1
-#define USB_RELEASE_INTERFACE_ERROR		1
-#define USB_ATTACH_KERNEL_DRIVER_ERROR	1
-#define USB_OPEN_ERROR					1
-
-#define USB_DEVICE_VID 						0x0781
-#define USB_DEVICE_PID						0x5151
-
-//general values for Descriptor of USB flash drive
-#define B_CONFIGURATION_VALUE	 			1
-#define BULK_ENDPOINT_IN 					0x81 		//default Endpoint for receiving for mass storage
-#define BULK_ENDPOINT_OUT 					0x02		//default Endpoint for sending for mass storage
-#define OUT_TIMEOUT							1000
-#define IN_TIMEOUT							1000
 
 struct libusb_device_handle *devh = NULL;
 int active_kernel_driver=0;
@@ -128,7 +112,7 @@ int flash_drive_init(void)
 	r=find_dpfp_device();
 	if(r<0)
 	{
-		printf("\nCouldnot Open the device. %d\n",r);
+		printf("\nCouldnot Open the device with VID= %04X and PID= %04X. Error : %d\n",USB_DEVICE_VID, USB_DEVICE_PID, r);
 		return USB_OPEN_ERROR;
 	}
 	else
@@ -393,14 +377,18 @@ int main (void)
 
 			// Reading Sector zero to sector 2. (Number of sector: 3)
 			printf("\nReading Sector from 0 to n:\n");
+
+			// reading sectors 
+			// No_of_bytes_to-read has max 65535
+			// 
+			uint16_t no_of_bytes_to_read = NO_OF_BYTES_TO_READ;
+			uint32_t starting_LBA = STARTING_LBA;
+			uint8_t current_sector;
+			uint8_t no_of_sectors_to_read = no_of_bytes_to_read/capacity.BlockSize;
+
+			buffer = malloc(sizeof(uint8_t) * no_of_bytes_to_read);
 			
-			// reading first ten sectors
-			int no_of_bytes_to_read_from_start=5120;
-			uint8_t starting_sector=0;
-			uint8_t no_of_sectors_to_read=no_of_bytes_to_read_from_start/capacity.BlockSize;
-			buffer = malloc(sizeof(uint8_t) * no_of_bytes_to_read_from_start);
-			
-			r=MassStore_ReadDeviceBlock(0, starting_sector, no_of_sectors_to_read, capacity.BlockSize, &buffer[0]);
+			r=MassStore_ReadDeviceBlock(0, starting_LBA, no_of_sectors_to_read, capacity.BlockSize, &buffer[0]);
 			if(r<0)
 			{
 				printf("Mass Storage Reading failed.\n");
@@ -408,11 +396,11 @@ int main (void)
 			else
 			{
 				printf("\nMass Storage Read success.\n");
-				for(r=0; r<no_of_bytes_to_read_from_start;r=r+capacity.BlockSize)
+				for( r = 0 ; r < no_of_bytes_to_read; r = r + capacity.BlockSize )
 				{
-					printf("\nBlockno: %d\n", (r/capacity.BlockSize));
+					current_sector = starting_LBA + (r/capacity.BlockSize);
+					printf("\nBlockNo: %d\n", current_sector);
 					print_hex_ascii(&buffer[r], capacity.BlockSize);
-
 				}
 				
 			}
