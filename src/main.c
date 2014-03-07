@@ -3,6 +3,7 @@
 /*----------------------------------------------------------------------*/
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <sys/types.h>
 #include <malloc.h>
 #include <unistd.h>
@@ -11,8 +12,6 @@
 #include "pff.h"
 #include "MassStoreCommands.h"
 #include "print_struct.h"
-
-//#include "scsi.h"
 
 #define USB_DETACH_KERNEL_DRIVER_ERROR	1
 #define USB_INIT_ERROR					1
@@ -345,6 +344,34 @@ int main (void)
 				printf("BlockSize: 0x%04X, %d bytes\n",capacity.BlockSize, capacity.BlockSize);
 			}
 
+			// Reading Sector zero to sector 2. (Number of sector: 3)
+			printf("\nReading Sector from 0 to n:\n");
+			
+			// reading first ten sectors
+			int no_of_bytes_to_read_from_start=5120;
+			uint8_t starting_sector=0;
+			uint8_t no_of_sectors_to_read=no_of_bytes_to_read_from_start/capacity.BlockSize;
+			uint8_t *buffer = malloc(sizeof(uint8_t) * no_of_bytes_to_read_from_start);
+			
+			r=MassStore_ReadDeviceBlock(0, starting_sector, no_of_sectors_to_read, capacity.BlockSize, &buffer[0]);
+			if(r<0)
+			{
+				printf("Mass Storage Reading failed.\n");
+			}
+			else
+			{
+				printf("\nMass Storage Read success.\n");
+				for(r=0; r<no_of_bytes_to_read_from_start;r=r+capacity.BlockSize)
+				{
+					printf("\nBlockno: %d\n", (r/capacity.BlockSize));
+					print_hex_ascii(&buffer[r], capacity.BlockSize);
+
+				}
+				
+			}
+			// free buffer
+			if(buffer)
+				free(buffer);
 
 		}
 
