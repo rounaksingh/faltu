@@ -7,6 +7,7 @@
 #include <sys/types.h>
 #include <malloc.h>
 #include <unistd.h>
+#include <signal.h>
 #include "main.h"
 #include "libusb.h"
 #include "pff.h"
@@ -32,6 +33,7 @@
 
 struct libusb_device_handle *devh = NULL;
 int active_kernel_driver=0;
+uint8_t *buffer;
 
 /*Functions for pff*/
 void die (		/* Stop with dying message */
@@ -171,6 +173,16 @@ int flash_drive_init(void)
 int flash_drive_deinit()
 {
 	int r;
+
+	// free buffer
+	if(buffer)
+		free(buffer);
+
+	if(devh)
+		libusb_close(devh);
+
+	libusb_exit(NULL);
+
 	// Reattch the kernel drivers
 	if(active_kernel_driver==1)
 	{
@@ -184,9 +196,6 @@ int flash_drive_deinit()
 			printf("\nReattach Completed.\n");
 	}
 	
-	libusb_close(devh);
-
-	libusb_exit(NULL);
 	return 0;
 }
 
@@ -266,12 +275,44 @@ int flash_drive_receive_data(unsigned char *data_ptr, int no_of_bytes, int *no_o
 	return r;
 }
 
+/************************************************************
+	Function Name: signal_callback_handler
+	Parameter: signum
+	Description: This function handles SIGTERM(15) (kill), SIGTSTP(20) (Ctrl+Z)
+				& SIGINT(2) (Ctrl+C)
+	Return Value: void.
+	
+*************************************************************/
+void signal_callback_handler(int signum)
+{
+	int ret_val;
+
+	printf("\nCaught signal %d\n",signum);
+   
+	// Cleanup and close up stuff
+	//return value is signal number
+	ret_val = flash_drive_deinit();
+	if(ret_val<0)
+	{
+		exit(ret_val);
+	}
+	else
+	{
+		exit(0);
+	}
+}
+
 /*-----------------------------------------------------------------------*/
 /* Program Main                                                          */
 /*-----------------------------------------------------------------------*/
 
 int main (void)
 {
+	// Register signal and signal handler
+   	signal(SIGINT, signal_callback_handler);
+	signal(SIGTSTP, signal_callback_handler);
+	signal(SIGTERM, signal_callback_handler);
+
 
 	int r, counter;
 	SCSI_Inquiry_Response_t req_sense_res;
@@ -351,7 +392,7 @@ int main (void)
 			int no_of_bytes_to_read_from_start=5120;
 			uint8_t starting_sector=0;
 			uint8_t no_of_sectors_to_read=no_of_bytes_to_read_from_start/capacity.BlockSize;
-			uint8_t *buffer = malloc(sizeof(uint8_t) * no_of_bytes_to_read_from_start);
+			buffer = malloc(sizeof(uint8_t) * no_of_bytes_to_read_from_start);
 			
 			r=MassStore_ReadDeviceBlock(0, starting_sector, no_of_sectors_to_read, capacity.BlockSize, &buffer[0]);
 			if(r<0)
@@ -369,9 +410,6 @@ int main (void)
 				}
 				
 			}
-			// free buffer
-			if(buffer)
-				free(buffer);
 
 		}
 
