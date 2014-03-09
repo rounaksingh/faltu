@@ -29,6 +29,7 @@ typedef enum {
 /* Prototypes for disk control functions */
 
 DSTATUS disk_initialize (void);
+DSTATUS disk_deinitialize (void);
 #if _USE_READ
 DRESULT disk_readp (
 	BYTE* dest,			/* Pointer to the destination object */

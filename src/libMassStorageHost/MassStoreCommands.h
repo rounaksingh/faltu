@@ -82,13 +82,12 @@
 		/** Additional error code for Mass Storage functions when a device returns a logical command failure */
 		#define MASS_STORE_SCSI_COMMAND_FAILED      0xC0
 
- 		// Macros for getting MaxLUN using a control transfer
- 		// as per USB Mass Storage Bulk Only Specification 1.0
- 		#define GETMAXLUN_CONTROL_REQUEST_TYPE		0xA1		//Class, Interface and Device to Host
- 		#define GETMAXLUN_CONTROL_REQUEST 			0xFE
- 		#define GETMAXLUN_CONTROL_VALUE				0x00
- 		#define GETMAXLUN_CONTROL_LENGTH 			0x01
- 		#define GETMAXLUN_RESPONSE_DATA_LENGTH		0x01
+// check for gcc compiler
+#ifndef __GNUC__
+#error 	"\n\nError:\nThe program is compatiable with only GCC compiler as program is having some gcc-specific attribute flags."\
+		"If there is urgent need to compiler this program is another compiler, "\
+		"please find a way to make compiler neglect the struct padding and alignment.\n\n"
+#endif
 
 	/* Type defines: */
 		/** Type define for a Mass Storage class Command Block Wrapper, used to wrap SCSI

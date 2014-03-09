@@ -49,11 +49,9 @@
  
 #define  INCLUDE_FROM_MASSSTORE_COMMANDS_C
 #include "MassStoreCommands.h"
-
-#include "main.h"
+#include "flash_drive.h"
 #include "print_struct.h"
 #include "common.h"
-#include "libusb.h"
 
 /** Current Tag value used in issued CBWs to the device. This is automatically incremented
  *  each time a command is sent, and is not externally accessible.
@@ -307,7 +305,7 @@ static uint8_t MassStore_GetReturnedStatus(CommandStatusWrapper_t* SCSICommandSt
 }
 
 /***************************************************************************/
-/*For Reset function we are directly implementing libusb built-in function.*/
+/*For Reset and GetMaxLUN function we are directly implementing libusb built-in function.*/
 /***************************************************************************/
 /** Issues a Mass Storage class specific request to reset the attached device's Mass Storage interface,
  *  readying the device for the next CBW.
@@ -344,10 +342,10 @@ static uint8_t MassStore_GetReturnedStatus(CommandStatusWrapper_t* SCSICommandSt
  *  \return A value from the USB_Host_SendControlErrorCodes_t enum, or MASS_STORE_SCSI_COMMAND_FAILED if the SCSI command fails
  */
 
-uint8_t MassStore_GetMaxLUN(uint8_t* const MaxLUNIndex)
+/*uint8_t MassStore_GetMaxLUN(uint8_t* const MaxLUNIndex)
 {
 	uint8_t ErrorCode ;
-/*
+
 	USB_ControlRequest = (USB_Request_Header_t)
 		{
 			.bmRequestType = (REQDIR_DEVICETOHOST | REQTYPE_CLASS | REQREC_INTERFACE),
@@ -370,30 +368,10 @@ uint8_t MassStore_GetMaxLUN(uint8_t* const MaxLUNIndex)
 		
 		// Clear the error, and pretend the request executed correctly if the device STALLed it
 		ErrorCode = HOST_SENDCONTROL_Successful;
-	}*/
-
-	// For getting maximum LUN, we need to send a control transfer as per USB Mass Storage Bulk Only Specification 1.0 section 3.2
-	// Taking Interface (USB) = Index (libusb_control_transfer) = 0
-	ErrorCode=libusb_control_transfer(devh,	GETMAXLUN_CONTROL_REQUEST_TYPE, GETMAXLUN_CONTROL_REQUEST, GETMAXLUN_CONTROL_VALUE, 0,
-	MaxLUNIndex, GETMAXLUN_CONTROL_LENGTH, 1000);
-	
-	// if GET MAX LUN returns 0 means successful and if MaxLUNIndex is zero means media controller has STALL
-	// therefore clear STALL or Endpoint halt 
-	if (ErrorCode == 0 && *MaxLUNIndex==0)
-	{
-		// Clear the pipe stall
-		// here endpoint is zero (0) that is Control Endpoint
-		ErrorCode = libusb_clear_halt(devh, 0);
-	
-		// Some faulty Mass Storage devices don't implement the GET_MAX_LUN request, so assume a single LUN
-		// *MaxLUNIndex = 0;
-		
-		// Clear the error, and pretend the request executed correctly if the device STALLed it
-		// ErrorCode = 0;
 	}
 
 	return ErrorCode;
-}
+}*/
 
 /** Issues a SCSI Inquiry command to the attached device, to determine the device's information. This
  *  gives information on the device's capabilities.
