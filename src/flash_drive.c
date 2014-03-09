@@ -4,7 +4,7 @@
 
 #include <stdio.h>
 #include <sys/types.h>
-#include <unistd.h>
+// #include <unistd.h>
 #include "flash_drive.h"
 #include "libusb.h"
 #include "MassStoreCommands.h"
@@ -172,7 +172,7 @@ int flash_drive_init(void)
 
 			}
 
-			usleep(2000000);
+			// usleep(2000000);
 		}
 		
 		printf("\nReading Capacity of Mass Storage device (LUN=0):\n");
@@ -255,7 +255,7 @@ int flash_drive_receive_data(unsigned char *data_ptr, int no_of_bytes, int *no_o
 
 	while(retry)
 		{
-			usleep(1000000);
+			// usleep(1000000);
 			printf("Retry %d",retry);
 			r=libusb_bulk_transfer(devh, BULK_ENDPOINT_IN, data_ptr, no_of_bytes, no_of_actually_received_bytes, IN_TIMEOUT);	
 			if(r==-9)
