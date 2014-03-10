@@ -202,7 +202,7 @@ int flash_drive_init(void)
 
 int flash_drive_deinit()
 {
-	int r;
+	int r=0;
 
 	// Reattch the kernel drivers
 	if(active_kernel_driver==1)
@@ -211,22 +211,21 @@ int flash_drive_deinit()
 		if(r<0)
 		{
 			printf("\nReattach Failed.	%d\n",r);
-			return USB_ATTACH_KERNEL_DRIVER_ERROR;
+			// We are not returning here because at the bottom r is not going to change 
+			//  therefore it will automatically return.
+			// return USB_ATTACH_KERNEL_DRIVER_ERROR;
 		}
 		else
 			printf("\nReattach Completed.\n");
 	}
 
-	// free buffer
-	// if(buffer)
-	// 	free(buffer);
-
+	// please donot put the libusb_close() and libusb_exit() above libusb_attach_kernel_driver()
 	if(devh)
 		libusb_close(devh);
 
 	libusb_exit(NULL);
 	
-	return 0;
+	return r;
 }
 
 int flash_drive_send_data(unsigned char *data_ptr, int no_of_bytes)
