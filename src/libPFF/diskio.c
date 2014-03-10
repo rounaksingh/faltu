@@ -3,10 +3,12 @@
 /*-----------------------------------------------------------------------*/
 
 #include <stdio.h>
+#include <stdlib.h>
 #include "diskio.h"
 #include "flash_drive.h"
 #include "MassStoreCommands.h"
 #include "print_struct.h"
+
 /*-----------------------------------------------------------------------*/
 /* Initialize Disk Drive                                                 */
 /*-----------------------------------------------------------------------*/
@@ -77,22 +79,77 @@ DRESULT disk_writep (
 )
 {
 	DRESULT res;
+	static DWORD *write_lba_ptr;	
+	static BYTE *temp_buffer_ptr;
+	static WORD *counter_ptr;
+	WORD i;
 
+	if(MassStore_TestUnitReady(0))
+	{
+		return RES_NOTRDY;
+	}
 
 	if (!buff) {
 		if (sc) {
 
 			// Initiate write process
+			write_lba_ptr=(DWORD *)malloc(sizeof(DWORD));
+			if(!write_lba_ptr)
+				return RES_ERROR;
+			*write_lba_ptr = sc;
+			temp_buffer_ptr=(BYTE *)malloc(sizeof(BYTE)*512);
+			if(!temp_buffer_ptr)
+				return RES_ERROR;
+			counter_ptr=(WORD *)malloc(sizeof(WORD));
+			if(!counter_ptr)
+				return RES_ERROR;
+			*counter_ptr=0;
+			
+			res = RES_OK;
 
 		} else {
 
 			// Finalize write process
+			while(*counter_ptr<512)
+			{
+				// pad remaining bytes of sector with zeroes
+				temp_buffer_ptr[*counter_ptr]=0;
+				(*counter_ptr)++;
+			}
+			print_hex_ascii(temp_buffer_ptr,*counter_ptr);
 
+			// write the sector
+			if(MassStore_WriteDeviceBlock(0,*write_lba_ptr,1,512,temp_buffer_ptr))
+			{
+				printf("MassStore_WriteDeviceBlock Failed.\n");
+				return RES_ERROR;
+			}
+
+			printf("MassStore_WriteDeviceBlock Success.\n");
+
+			if(write_lba_ptr)
+				free(write_lba_ptr);
+			if(temp_buffer_ptr)
+				free(temp_buffer_ptr);
+			if(counter_ptr)
+				free(counter_ptr);
+
+			res = RES_OK;
 		}
 	} else {
 
 		// Send data to the disk
+		for (i=0;i<sc;i++)
+		{
+			temp_buffer_ptr[*counter_ptr] = buff[i];
+			printf("%c",buff[i]);
+			
+			(*counter_ptr)++;
 
+				
+		}
+
+		res = RES_OK;
 	}
 
 	return res;

@@ -937,7 +937,7 @@ FRESULT pf_write (
 		if (!(fs->flag & FA__WIP))		/* Round-down fptr to the sector boundary */
 			fs->fptr &= 0xFFFFFE00;
 	}
-	remain = fs->fsize - fs->fptr;
+	remain = fs->fsize - fs->fptr;					//if remaining filesystem size is less than
 	if (btw > remain) btw = (WORD)remain;			/* Truncate btw by remaining bytes */
 
 	while (btw)	{									/* Repeat until all data transferred */

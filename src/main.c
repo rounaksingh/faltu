@@ -89,19 +89,20 @@ int main (void)
 	*/
 #if _USE_WRITE
 	printf("\nOpen a file to write (write.txt).\n");
-	rc = pf_open("WRITE.TXT");
+	rc = pf_open("usbmon.txt");
 	if (rc) die(rc);
 
 	printf("\nWrite a text data. (Hello world!)\n");
 	for (;;) {
-		rc = pf_write("Hello world!\r\n", 14, &bw);
+		//rc = pf_write("Hello world!\r\n", 14, &bw);
+		rc = pf_write("sdkfglaksdjflkasjdf!\r\n", 22, &bw);
 		if (rc || !bw) break;
 	}
 	if (rc) die(rc);
 
-	printf("\nTerminate the file write process.\n");
 	rc = pf_write(0, 0, &bw);
 	if (rc) die(rc);
+	printf("\nTerminate the file write process.\n");
 #endif
 
 #if _USE_DIR
