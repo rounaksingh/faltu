@@ -49,6 +49,7 @@ void die (		/* Stop with dying message */
 /*-----------------------------------------------------------------------*/
 /* Program Main                                                          */
 /*-----------------------------------------------------------------------*/
+#define SIZE_OF_BUFFER			512			//64
 
 int main (void)
 {
@@ -61,26 +62,31 @@ int main (void)
 	DIR dir;				/* Directory object */
 	FILINFO fno;			/* File information object */
 	WORD bw, br, i;
-	BYTE buff[64];
+	BYTE buff[SIZE_OF_BUFFER];
 	FRESULT rc;
 
 	printf("\nMount a volume.\n");
 	rc = pf_mount(&fatfs);
 	if (rc) die(rc);
 
-	printf("\nOpen a test file (message.txt).\n");
-	rc = pf_open("MESSAGE.TXT");
+	/*printf("\nOpen a test file (message.txt).\n");
+	//rc = pf_open("MESSAGE.TXT");			// 10 bytes
+	// rc = pf_open("Fuses.txt");			//222 bytes
+	// rc = pf_open("cutecom.log");			//1.5MiB
+	rc = pf_open("usbmon.txt");			//108kiB
 	if (rc) die(rc);
 
 	printf("\nType the file content.\n");
 	for (;;) {
-		rc = pf_read(buff, sizeof(buff), &br);	/* Read a chunk of file */
-		if (rc || !br) break;			/* Error or end of file */
-		for (i = 0; i < br; i++)		/* Type the data */
+		rc = pf_read(buff, sizeof(buff), &br);	 //Read a chunk of file 
+		if (rc || !br) break;			// Error or end of file
+		for (i = 0; i < br; i++)		// Type the data 
 			putchar(buff[i]);
 	}
 	if (rc) die(rc);
 
+	printf("File Read Complete.\n");
+	*/
 #if _USE_WRITE
 	printf("\nOpen a file to write (write.txt).\n");
 	rc = pf_open("WRITE.TXT");
