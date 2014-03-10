@@ -10,6 +10,8 @@
 #include "MassStoreCommands.h"
 #include "print_struct.h"
 
+//#define DEBUG_FLASH_DRIVE		1
+
 struct libusb_device_handle *devh = NULL;
 int active_kernel_driver=0;
 uint8_t *buffer;
@@ -78,7 +80,7 @@ int flash_drive_init(void)
 	
 	r=find_dpfp_device();
 	if(r<0)
-	{
+	{	
 		printf("\nCouldnot Open the device with VID= %04X and PID= %04X. Error : %d\n",USB_DEVICE_VID, USB_DEVICE_PID, r);
 		return USB_OPEN_ERROR;
 	}
@@ -235,14 +237,17 @@ int flash_drive_send_data(unsigned char *data_ptr, int no_of_bytes)
 	r=libusb_bulk_transfer(devh, BULK_ENDPOINT_OUT, data_ptr, no_of_bytes, &actual_length, OUT_TIMEOUT);
 	if(r<0)
 	{
+		#ifdef DEBUG_FLASH_DRIVE
 		printf("\nSend Failure.	%d\n",r);
-
+		#endif
 		return r;
 	}
 
 	else
 	{
+		#ifdef DEBUG_FLASH_DRIVE
 		printf("\nSend Complete. %d  %d\n",no_of_bytes, actual_length);	
+		#endif
 	}
 	
 	return 0;
@@ -256,23 +261,31 @@ int flash_drive_receive_data(unsigned char *data_ptr, int no_of_bytes, int *no_o
 	while(retry)
 		{
 			// usleep(1000000);
+			#ifdef DEBUG_FLASH_DRIVE
 			printf("Retry %d",retry);
+			#endif
 			r=libusb_bulk_transfer(devh, BULK_ENDPOINT_IN, data_ptr, no_of_bytes, no_of_actually_received_bytes, IN_TIMEOUT);	
 			if(r==-9)
 			{
 				retry--;
+				#ifdef DEBUG_FLASH_DRIVE
 				printf("PIPE ERROR\n");
+				#endif
 				continue;
 			}
 			else if(r<0)	
 			{	
-				retry--;											
+				retry--;
+				#ifdef DEBUG_FLASH_DRIVE
 				printf("\nReceive Failure.	Error:%d\tReceivedBytes:%d\tActuallyReceivedBytes:%d\n",r,no_of_bytes,*no_of_actually_received_bytes);
+				#endif
 				continue;
 			}
 			else
 			{
+				#ifdef DEBUG_FLASH_DRIVE
 				printf("\nReceive Complete. \tReceivedBytes:%d\tActuallyReceivedBytes:%d\n",no_of_bytes,*no_of_actually_received_bytes);
+				#endif
 				break;	
 			}
 			
@@ -288,15 +301,6 @@ int flash_drive_reset()
 	int r;
 	//reset the device
 	r=libusb_reset_device(devh);
-	if(r<0)
-	{
-		printf("\nCouldnot reset. %d\n",r);
-		return -23;
-	}
-	else
-	{
-		printf("\nRESET.\n");
-	}
 
 	return r;
 }

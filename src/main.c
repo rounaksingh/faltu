@@ -107,7 +107,7 @@ int main (void)
 
 #if _USE_DIR
 	printf("\nOpen root directory.\n");
-	rc = pf_opendir(&dir, "");
+	rc = pf_opendir(&dir, "/USB");
 	if (rc) die(rc);
 
 	printf("\nDirectory listing...\n");

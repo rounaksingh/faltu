@@ -53,6 +53,8 @@
 #include "print_struct.h"
 #include "common.h"
 
+// #define DEBUG_MASS_STORE_COMMANDS		1
+
 /** Current Tag value used in issued CBWs to the device. This is automatically incremented
  *  each time a command is sent, and is not externally accessible.
  */
@@ -84,9 +86,9 @@ static uint8_t MassStore_SendCommand(CommandBlockWrapper_t* SCSICommandBlock, vo
 	/* Write the CBW command to the OUT pipe */
 	// if ((ErrorCode = Pipe_Write_Stream_LE(SCSICommandBlock, sizeof(CommandBlockWrapper_t))) != PIPE_RWSTREAM_NoError)
 	//   return ErrorCode;
-
+	#ifdef DEBUG_MASS_STORE_COMMANDS
 	printf("Size of CommandBlockWrapper_t= %d\n",sizeof(CommandBlockWrapper_t));
-	
+	#endif
 	/* Testing for the SCSI commands Block Wrapper and printing the Command Block Wrapper	
 	 int i;
 	unsigned char *command;

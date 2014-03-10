@@ -9,6 +9,7 @@
 #include "MassStoreCommands.h"
 #include "print_struct.h"
 
+// #define DEBUG_DISKIO	1
 /*-----------------------------------------------------------------------*/
 /* Initialize Disk Drive                                                 */
 /*-----------------------------------------------------------------------*/
@@ -47,12 +48,16 @@ DRESULT disk_readp (
 	// print_hex_ascii(temp_buffer,512);
 	if(r<0)
 	{
+		#ifdef DEBUG_DISKIO
 		printf("Mass Storage Reading failed.\n");
+		#endif
 		res=RES_ERROR;
 	}
 	else
 	{
+		#ifdef DEBUG_DISKIO
 		printf("\nMass Storage Read success.\n");
+		#endif
 		// Since the sofs and count will be under 512 
 		// therefore the array temp_buffer does not go out of bound
 		for(i=sofs;i<(sofs+count);i++)
@@ -120,12 +125,15 @@ DRESULT disk_writep (
 
 			// write the sector
 			if(MassStore_WriteDeviceBlock(0,*write_lba_ptr,1,512,temp_buffer_ptr))
-			{
+			{	
+				#ifdef DEBUG_DISKIO
 				printf("MassStore_WriteDeviceBlock Failed.\n");
+				#endif
 				return RES_ERROR;
 			}
-
+			#ifdef DEBUG_DISKIO
 			printf("MassStore_WriteDeviceBlock Success.\n");
+			#endif
 
 			if(write_lba_ptr)
 				free(write_lba_ptr);
@@ -143,7 +151,7 @@ DRESULT disk_writep (
 		{
 			temp_buffer_ptr[*counter_ptr] = buff[i];
 			printf("%c",buff[i]);
-			
+
 			(*counter_ptr)++;
 
 				
