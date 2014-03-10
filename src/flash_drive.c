@@ -204,15 +204,6 @@ int flash_drive_deinit()
 {
 	int r;
 
-	// free buffer
-	// if(buffer)
-	// 	free(buffer);
-
-	if(devh)
-		libusb_close(devh);
-
-	libusb_exit(NULL);
-
 	// Reattch the kernel drivers
 	if(active_kernel_driver==1)
 	{
@@ -225,6 +216,15 @@ int flash_drive_deinit()
 		else
 			printf("\nReattach Completed.\n");
 	}
+
+	// free buffer
+	// if(buffer)
+	// 	free(buffer);
+
+	if(devh)
+		libusb_close(devh);
+
+	libusb_exit(NULL);
 	
 	return 0;
 }
