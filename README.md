@@ -68,24 +68,31 @@ This command when run terminal download the development packages and binary libr
 As a primary requirement, we need a USB flash drive. Also, the computer on which you want to run 
 
 ### How to know the VID and PID of a USB device
-Most of the linux box has "lsusb" as a built-in command to access the list of connected USB devices. 
+Most of the linux box has "lsusb" as a built-in command to access the list of connected USB devices.
+
 	$ lsusb
 
-The same commands can be used to print the PID and VID of the USB devices. The command also provide the functionality for printing decriptors such as device, configuration, interface and endpoint descriptors of a particular connected USB device. The aforementioned functionality can be achieved using below command:
+The same commands can be used to print the PID and VID of the USB devices. 
+
+The command also provide the functionality for printing decriptors such as device, configuration, interface and endpoint descriptors of a particular connected USB device. The aforementioned functionality can be achieved using below command:
+
 	$ lsusb -v -d aaaa:bbbb
 
 where aaaa is the hexadecimal VID and bbbb is the hexadecimal PID.
 
 For more information about lsusb, please read its man page by using the following command:
+
 	$ man lsusb
 
 ### How to compile and run the program
 Please change the VID and PID of device in main.h. Also, the starting number of sectors(starting LBA) and no of bytes to read (for now provide no of bytes to read should be multiple of Block or sector size) should be provided in main.h. Moreover, note that if you have install libusb-1.0-0-dev package in folder other than /usr/local/lib, then update the folder location of libusb by changing the LIBUSB_DIR variable in Makefile.
 
 To compile the program, do:
+
 	$ make all
 
 To clean the project:
+
 	$ make clean
 
 The compilation creates build files, which are stored in build folders, and binary executable file which is stored in bin folder. All folders are created automatically while building the project using Make utility. Moreover, while cleaning the project, build and bin folders including files, inside them, are removed.
@@ -94,6 +101,7 @@ To run the program, please execute the "main" in bin folder.
 
 Important Note: If the USB device has not have user level access permission, then please execute the "main" binary file with super user priviledge.
 From project folder, run:
+
 	$ sudo ./bin/main 
 
 ### Brief about Errors
