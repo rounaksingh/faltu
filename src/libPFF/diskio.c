@@ -10,7 +10,6 @@
 #include "MassStoreCommands.h"
 #include "print_struct.h"
 
-// #define DEBUG_DISKIO	1
 /*-----------------------------------------------------------------------*/
 /* Initialize Disk Drive                                                 */
 /*-----------------------------------------------------------------------*/

@@ -53,8 +53,6 @@
 #include "print_struct.h"
 #include "common.h"
 
-// #define DEBUG_MASS_STORE_COMMANDS		1
-
 /** Current Tag value used in issued CBWs to the device. This is automatically incremented
  *  each time a command is sent, and is not externally accessible.
  */
