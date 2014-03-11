@@ -740,13 +740,16 @@ FRESULT pf_mount (
 {
 	BYTE fmt, buf[36];
 	DWORD bsect, fsize, tsect, mclst;
-
+	BYTE ret_val;
 
 	FatFs = 0;
 	if (!fs) return FR_OK;				/* Unregister fs object */
 
-	if (disk_initialize() & STA_NOINIT)	/* Check if the drive is ready or not */
+	ret_val = disk_initialize();	/* Check if the drive is initialized and ready, or not */
+	if ( ret_val == STA_NOINIT )
 		return FR_NOT_READY;
+	else if( ret_val == STA_NODISK )
+		return FR_NO_DISK_FOUND;
 
 	/* Search FAT partition on the drive */
 	bsect = 0;

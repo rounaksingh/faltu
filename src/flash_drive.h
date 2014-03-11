@@ -1,27 +1,34 @@
-#ifndef _MAIN_H_
-#define _MAIN_H_
+#ifndef __FLASH_DRIVE_H__
+#define __FLASH_DRIVE_H__
 
-#include "libusb.h"
+// flash_init() Error Return Values
+#define FLASH_DRIVE_INIT_SUCCESS							0
+#define FLASH_DRIVE_INIT_ERR_LIBUSB_INIT					1
+#define FLASH_DRIVE_INIT_ERR_LIBUSB_OPEN_DEVICE				2
+#define FLASH_DRIVE_INIT_ERR_LIBUSB_DETTACH_KERNEL_DRIVER	3
+#define FLASH_DRIVE_INIT_ERR_LIBUSB_RESET_DRIVER			4
+#define	FLASH_DRIVE_INIT_ERR_LIBUSB_CLAIM_INTERFACE			5
+#define FLASH_DRIVE_INIT_ERR_SCSI_INQUIRY					6
+#define FLASH_DRIVE_INIT_ERR_TEST_UNIT_READY				7
+#define FLASH_DRIVE_INIT_ERR_READ_CAPACITY					8
+#define FLASH_DRIVE_INIT_ERR_BLOCKSIZE_NOT_512				9
+#define FLASH_DRIVE_INIT_ERR_LIBUSB_KERNEL_ACTIVE			10
 
-#define USB_DEVICE_VID 						0x0781
-#define USB_DEVICE_PID						0x5151
-#define STARTING_LBA						17			// address of starting sector.
-#define NO_OF_BYTES_TO_READ 				65500		// No of Bytes to read please 
+// flash_deinit() Error Return Values
+#define FLASH_DRIVE_DEINIT_SUCCESS							0
+#define FLASH_DRIVE_DEINIT_ERR_REATTACH_KERNEL_DRIVER		1
 
-#define USB_DETACH_KERNEL_DRIVER_ERROR		1
-#define USB_INIT_ERROR						1
-#define USB_CLAIM_INTERFACE_ERROR			1
-#define USB_RELEASE_INTERFACE_ERROR			1
-#define USB_ATTACH_KERNEL_DRIVER_ERROR		1
-#define USB_OPEN_ERROR						1
+// DEFAULT values for Descriptor of USB flash drive (For BULK ONLY USB TRANSFER)
+#define BULK_ONLY_DEFAULT_CONFIGURATION_VALUE	 			1
+#define BULK_ONLY_DEFAULT_ENDPOINT_IN 						0x81
+#define BULK_ONLY_DEFAULT_ENDPOINT_OUT 						0x02
+#define BULK_ONLY_DEFAULT_LUN_NUMBER						0
+#define BULK_ONLY_DEFAULT_INTERFACE_NUMBER					0
 
-//general values for Descriptor of USB flash drive (For BULK ONLY USB TRANSFER)
-#define B_CONFIGURATION_VALUE	 				1
-#define BULK_ENDPOINT_IN 						0x81 		//default Endpoint for receiving for mass storage
-#define BULK_ENDPOINT_OUT 						0x02		//default Endpoint for sending for mass storage
-#define OUT_TIMEOUT								1000
-#define IN_TIMEOUT								1000
-#define CONTROL_TIMEOUT							1000
+// libusb Timeout for Control and Bulk Transfers. Timeouts are in milliseconds.
+#define OUT_TIMEOUT											1000
+#define IN_TIMEOUT											1000
+#define CONTROL_TIMEOUT										1000
 
 // Macros for getting MaxLUN using a control transfer
 // as per USB Mass Storage Bulk Only Specification 1.0
@@ -30,8 +37,6 @@
 #define GETMAXLUN_CONTROL_VALUE				0x00
 #define GETMAXLUN_CONTROL_LENGTH 			0x01
 #define GETMAXLUN_RESPONSE_DATA_LENGTH		0x01
-
-extern struct libusb_device_handle *devh;
 
 int flash_drive_init(void);
 int flash_drive_deinit(void);

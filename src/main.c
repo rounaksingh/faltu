@@ -3,11 +3,10 @@
 /*----------------------------------------------------------------------*/
 
 #include <stdio.h>
-#include <unistd.h>
+#include <inttypes.h>
 #include <signal.h>
 #include <stdlib.h>
 #include "pff.h"
-#include "flash_drive.h"
 #include "diskio.h"
 
 /***********************************************************

@@ -12,8 +12,9 @@
 /* Status of Disk Functions */
 typedef BYTE	DSTATUS;
 
-#define STA_NOINIT		0x01	/* Drive not initialized */
-#define STA_NODISK		0x02	/* No medium in the drive */
+#define STA_INIT_SUCCESS	0x00	/* Drive Initialized 		*/
+#define STA_NOINIT			0x01	/* Drive not initialized 	*/
+#define STA_NODISK			0x02	/* No medium in the drive 	*/
 
 
 /* Results of Disk Functions */

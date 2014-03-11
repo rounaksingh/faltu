@@ -126,7 +126,8 @@ typedef enum {
 	FR_NO_PATH,			/* 4 */
 	FR_NOT_OPENED,		/* 5 */
 	FR_NOT_ENABLED,		/* 6 */
-	FR_NO_FILESYSTEM	/* 7 */
+	FR_NO_FILESYSTEM,	/* 7 */
+	FR_NO_DISK_FOUND,	/* 8 */
 } FRESULT;
 
 

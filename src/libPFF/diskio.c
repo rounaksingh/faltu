@@ -4,6 +4,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <inttypes.h>
 #include "diskio.h"
 #include "flash_drive.h"
 #include "MassStoreCommands.h"
@@ -13,15 +14,26 @@
 /*-----------------------------------------------------------------------*/
 /* Initialize Disk Drive                                                 */
 /*-----------------------------------------------------------------------*/
-
+/**
+ * Initializes the USB flash drive for opearations such as disk read, disk write.
+ * Commands which initializes the USB flash drive, need to be written here.
+ * @return  [description]
+ */
 DSTATUS disk_initialize (void)
 {
-	DSTATUS stat;
+	uint ret_val;
 
-	stat=(DSTATUS)flash_drive_init();
+	ret_val = flash_drive_init();
+	if(ret_val == FLASH_DRIVE_INIT_ERR_LIBUSB_OPEN_DEVICE)
+	{
+		return STA_NODISK;
+	}
+	else if(ret_val>0)
+	{
+		return STA_NOINIT;
+	}
 
-	
-	return stat;
+	return STA_INIT_SUCCESS;
 }
 
 
@@ -43,12 +55,12 @@ DRESULT disk_readp (
 	// BYTE *temp_dest;
 	// temp_dest=dest;
 	int r;
-
+/*
 	if(MassStore_TestUnitReady(0))
 	{
 		return RES_NOTRDY;
 	}
-
+*/
 	r=MassStore_ReadDeviceBlock(0, sector, 1, 512, &temp_buffer[0]);
 	// print_hex_ascii(temp_buffer,512);
 	if(r<0)
@@ -168,21 +180,21 @@ DRESULT disk_writep (
 	return res;
 }
 
+/**
+ * [disk_deinitialize  description]
+ * @return  [description]
+ */
 DSTATUS disk_deinitialize (void)
 {
-	int r;
-	// release the interface zero if claimed.
-	r=libusb_release_interface(devh,0);
-	if(r<0)
+	int ret_val;
+
+	// The flash_drive_deinit() releases the interface zero, reattach the kernel driver 
+	// and closes the libusb library.
+	ret_val=  flash_drive_deinit();
+	if(ret_val<0)
 	{
-		printf("\nRelease of Interface Failed.	%d\n",r);
+		return RES_ERROR;
 	}
-	//}
-	else
-	printf("\nInterfaced released.\n");
-
-	flash_drive_deinit();
-
 	return RES_OK;
 
 }
