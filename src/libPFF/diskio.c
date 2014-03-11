@@ -44,6 +44,11 @@ DRESULT disk_readp (
 	// temp_dest=dest;
 	int r;
 
+	if(MassStore_TestUnitReady(0))
+	{
+		return RES_NOTRDY;
+	}
+
 	r=MassStore_ReadDeviceBlock(0, sector, 1, 512, &temp_buffer[0]);
 	// print_hex_ascii(temp_buffer,512);
 	if(r<0)
