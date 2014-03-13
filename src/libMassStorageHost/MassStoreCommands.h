@@ -200,7 +200,6 @@
 	/* Function Prototypes: */
 		#if defined(INCLUDE_FROM_MASSSTORE_COMMANDS_C)
 			static uint8_t MassStore_SendCommand(CommandBlockWrapper_t* SCSICommandBlock, void* BufferPtr);
-			// static uint8_t MassStore_WaitForDataReceived(void);
 			static uint8_t MassStore_SendReceiveData(CommandBlockWrapper_t* SCSICommandBlock, void* BufferPtr); // ATTR_NON_NULL_PTR_ARG(1);
 			static uint8_t MassStore_GetReturnedStatus(CommandStatusWrapper_t* SCSICommandStatus);  // ATTR_NON_NULL_PTR_ARG(1);
 		#endif
