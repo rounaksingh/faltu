@@ -6,7 +6,7 @@
 #include <inttypes.h>
 #include <signal.h>
 #include <stdlib.h>
-#include "pff.h"
+#include "ff.h"
 #include "diskio.h"
 
 /***********************************************************
@@ -59,33 +59,40 @@ int main (void)
 
 	FATFS fatfs;			/* File system object */
 	DIR dir;				/* Directory object */
-	FILINFO fno;			/* File information object */
-	WORD bw, br, i;
-	BYTE buff[SIZE_OF_BUFFER];
+	// FILINFO fno;			/* File information object */
+	WORD i;
+	 BYTE buff[SIZE_OF_BUFFER];
 	FRESULT rc;
 
+	FATFS FatFs;		/* FatFs work area needed for each volume */
+	FIL Fil;			/* File object needed for each open file */
+
+	UINT bw, br;
+
 	printf("\nMount a volume.\n");
-	rc = pf_mount(&fatfs);
+	rc = f_mount(&fatfs, "", 1);	/* Give a work area to the default drive */
 	if (rc) die(rc);
 
-	/*printf("\nOpen a test file (message.txt).\n");
-	//rc = pf_open("MESSAGE.TXT");			// 10 bytes
-	// rc = pf_open("Fuses.txt");			//222 bytes
-	// rc = pf_open("cutecom.log");			//1.5MiB
-	rc = pf_open("usbmon.txt");			//108kiB
-	if (rc) die(rc);
+	printf("\nOpen a test file (message.txt).\n");
 
-	printf("\nType the file content.\n");
-	for (;;) {
-		rc = pf_read(buff, sizeof(buff), &br);	 //Read a chunk of file 
-		if (rc || !br) break;			// Error or end of file
-		for (i = 0; i < br; i++)		// Type the data 
-			putchar(buff[i]);
+	// open an existing file with read access
+	if (f_open(&Fil, "Fuses.txt", FA_READ | FA_OPEN_EXISTING) == FR_OK) 	/* Create a file */
+	{
+		printf("\nType the file content.\n");
+		for (;;) 
+		{
+			rc = f_read(&Fil, &buff, SIZE_OF_BUFFER, &br);
+			if (rc || !br) break;			// Error or end of file
+			for (i = 0; i < br; i++)		// Type the data 
+				putchar(buff[i]);
+		}
+		if (rc) die(rc);
+
+		f_close(&Fil);								/* Close the file */
 	}
 	if (rc) die(rc);
-
 	printf("File Read Complete.\n");
-	*/
+	
 #if _USE_WRITE
 	printf("\nOpen a file to write (write.txt).\n");
 	rc = pf_open("usbmon.txt");

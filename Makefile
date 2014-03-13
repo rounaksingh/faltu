@@ -12,9 +12,9 @@ SRCEXT := c
 
 #SOURCES := $(shell find $(SRCDIR) -type f -name *.$(SRCEXT))
 #
-SRC = main.c flash_drive.c libPFF/diskio.c libPFF/pff.c libMassStorageHost/MassStoreCommands.c libMassStorageHost/print_struct.c
+SRC = main.c flash_drive.c libFATfs/diskio.c libFATfs/ff.c libMassStorageHost/MassStoreCommands.c libMassStorageHost/print_struct.c
 
-EXTRAINCDIRS = . src src/libMassStorageHost src/libPFF
+EXTRAINCDIRS = . src src/libMassStorageHost src/libFATfs
 
 LIBUSB_DIR = /usr/local/lib
 
@@ -54,7 +54,7 @@ clean:
 	@echo "Removed Build files and executable file.";
 
 make_dir:
-	@mkdir -p $(OBJDIR) $(OBJDIR)/libPFF $(OBJDIR)/libMassStorageHost
+	@mkdir -p $(OBJDIR) $(OBJDIR)/libFATfs $(OBJDIR)/libMassStorageHost
 	@mkdir -p $(BINDIR)
 
 msg_start:
