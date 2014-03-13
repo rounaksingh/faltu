@@ -30,6 +30,14 @@
 #define IN_TIMEOUT											1000
 #define CONTROL_TIMEOUT										1000
 
+// Macros for Reset using a control transfer
+// as per USB Mass Storage Bulk Only Specification 1.0
+#define RESET_CONTROL_REQUEST_TYPE		0x21		//Class, Interface and Device to Host
+#define RESET_CONTROL_REQUEST 			0xFF
+#define RESET_CONTROL_VALUE				0x00
+#define RESET_CONTROL_LENGTH 			0x01
+#define RESET_RESPONSE_DATA_LENGTH		0x00
+
 // Macros for getting MaxLUN using a control transfer
 // as per USB Mass Storage Bulk Only Specification 1.0
 #define GETMAXLUN_CONTROL_REQUEST_TYPE		0xA1		//Class, Interface and Device to Host

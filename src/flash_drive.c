@@ -1,7 +1,26 @@
-/*----------------------------------------------------------------------*/
-/* Petit FatFs sample project for generic uC  (C)ChaN, 2010             */
-/*----------------------------------------------------------------------*/
-
+/***************************************************************************************************
+ *
+ *  Copyright 2014  Rounak SIngh (rounaksingh17@gmail.com)
+ *
+ *  Permission to use, copy, modify, and distribute this software
+ *  and its documentation for any purpose and without fee is hereby
+ *  granted, provided that the above copyright notice appear in all
+ *  copies and that both that the copyright notice and this
+ *  permission notice and warranty disclaimer appear in supporting
+ *  documentation, and that the name of the author not be used in
+ *  advertising or publicity pertaining to distribution of the
+ *  software without specific, written prior permission.
+ *
+ *  The author disclaim all warranties with regard to this
+ *  software, including all implied warranties of merchantability
+ *  and fitness.  In no event shall the author be liable for any
+ *  special, indirect or consequential damages or any damages
+ *  whatsoever resulting from loss of use, data or profits, whether
+ *  in an action of contract, negligence or other tortious action,
+ *  arising out of or in connection with the use or performance of
+ *  this software.
+ *  
+ ****************************************************************************************************/
 #include <stdio.h>
 #include <inttypes.h>
 #include "flash_drive.h"
@@ -68,6 +87,7 @@ out:
 /**
  * Initializes the USB Flash drive. Function finds the USB flash device using its VID and PID, then
  * initiate a sequence of functions to enumerate the device and start the communication with it.
+ * 
  * @return  Errors/Success (For more info on Errors, Please refer the flash_drive.h file)
  */
 int flash_drive_init(void)
@@ -224,7 +244,8 @@ int flash_drive_init(void)
 /*****************************************************************************************************************/
 
 /**
- * Deinitializes the USB flash_drive after use
+ * Deinitializes the USB flash_drive after use.
+ * 
  * @return Errors/Success (For more info on Errors, Please refer the flash_drive.h file)
  */
 int flash_drive_deinit()
@@ -270,77 +291,88 @@ int flash_drive_deinit()
 /*****************************************************************************************************************/
 
 /**
- * [flash_drive_send_data description]
- * @param  data_ptr    [description]
- * @param  no_of_bytes [description]
- * @return             [description]
+ * Sends the data to the USB flash device using USB Bulk transfer. 
+ * The function uses libusb_bulk_transfer() as transport function. 
+ * In addition the function implement just Bulk-Only transfer for 
+ * default Endpoint OUT (that is 0x02).
+ * 
+ * @param  data_ptr    Pointer to data buffer
+ * @param  no_of_bytes Number of bytes in data buffer
+ * @return             Errors/Success (Refer the flash_drive.h for more information.)
  */
 int flash_drive_send_data(unsigned char *data_ptr, int no_of_bytes)
 {
 	int ret_val;
 	int actual_length=2;
 
+	// transfer the data to ENDPOINT OUT using USB Bulk Transfer.
 	ret_val=libusb_bulk_transfer(devh, BULK_ONLY_DEFAULT_ENDPOINT_OUT, data_ptr, no_of_bytes, &actual_length, OUT_TIMEOUT);
-	if(ret_val<0)
-	{
-		#ifdef DEBUG_FLASH_DRIVE
-		printf("\nSend Failure.	%d\n",ret_val);
-		#endif
-		return ret_val;
-	}
-
-	else
+	
+	// The if condition checks whether ret_val equals 0 (libusb SUCCESS) and 
+	// Number of bytes to send is equal to the number of bytes which are actually sent.
+	if((ret_val == 0) && (actual_length == no_of_bytes))
 	{
 		#ifdef DEBUG_FLASH_DRIVE
 		printf("\nSend Complete. %d  %d\n",no_of_bytes, actual_length);	
 		#endif
 	}
+	else
+	{		
+		#ifdef DEBUG_FLASH_DRIVE
+		printf("\nSend Failure.	%d\n",ret_val);
+		#endif
+		return ret_val;
+	}
 	
 	return 0;
-}
+}/* End flash_drive_send_data() */
+/*****************************************************************************************************************/
 
+/**
+ * Receive the data send by the USB device. But the data transfer is initiated by USB Host.
+ * The function implement Bulk Only transfer with default IN enpoint which is 0x81.
+ * The function returns does not return error if actually received bytes are less than 
+ * the desired number of bytes.
+ * 
+ * @param  data_ptr                      Pointer to data buffer
+ * @param  no_of_bytes                   Number of bytes to receive  or Length of data buffer
+ * @param  no_of_actually_received_bytes Number of Actually received bytes
+ * @return                               Error code or Success
+ */
 int flash_drive_receive_data(unsigned char *data_ptr, int no_of_bytes, int *no_of_actually_received_bytes)
 {
 	int ret_val;
-	int retry=5;
 
-	while(retry)
-		{
-			#ifdef DEBUG_FLASH_DRIVE
-			printf("Retry %d",retry);
-			#endif
-			ret_val=libusb_bulk_transfer(devh, BULK_ONLY_DEFAULT_ENDPOINT_IN, data_ptr, no_of_bytes, no_of_actually_received_bytes, IN_TIMEOUT);
-			if(ret_val==-9)
-			{
-				retry--;
-				#ifdef DEBUG_FLASH_DRIVE
-				printf("PIPE ERROR\n");
-				#endif
-				continue;
-			}
-			else if(ret_val<0)	
-			{	
-				retry--;
-				#ifdef DEBUG_FLASH_DRIVE
-				printf("\nReceive Failure.	Error:%d\tReceivedBytes:%d\tActuallyReceivedBytes:%d\n",ret_val,no_of_bytes,*no_of_actually_received_bytes);
-				#endif
-				continue;
-			}
-			else
-			{
-				#ifdef DEBUG_FLASH_DRIVE
-				printf("\nReceive Complete. \tReceivedBytes:%d\tActuallyReceivedBytes:%d\n",no_of_bytes,*no_of_actually_received_bytes);
-				#endif
-				break;
-			}
-			
-		}
+	ret_val=libusb_bulk_transfer(devh, BULK_ONLY_DEFAULT_ENDPOINT_IN, data_ptr, no_of_bytes, no_of_actually_received_bytes, IN_TIMEOUT);
+	if(ret_val==-9)
+	{
+		#ifdef DEBUG_FLASH_DRIVE
+		printf("PIPE HALT or PIPE STALL. LIBUSB ERROR: -9\n");
+		#endif
+	}
+	else if(ret_val<0)	
+	{	
+		#ifdef DEBUG_FLASH_DRIVE
+		printf("\nReceive Failure. LIBUSB ERROR: %d",ret_val);
+		#endif
+	}
+	else
+	{
+		#ifdef DEBUG_FLASH_DRIVE
+		printf("\nReceive Complete. \tReceivedBytes:%d\tActuallyReceivedBytes:%d\n",no_of_bytes,*no_of_actually_received_bytes);
+		#endif
+	}
 
 	return ret_val;
-}
+} /* End flash_drive_receive_data() */
+/*****************************************************************************************************************/
 
-// THought the MassStoreCommands.c has a specific function for reseting the USB flash device 
-// by using SCSI commands 
+/**
+ * Resets the USB flash drive using a default provided by the libusb library. 
+ * The Function does a soft reset to flash drive to make it receive a new Command Block Wrapper.
+ * 
+ * @return Error codes/Success
+ */
 int flash_drive_reset()
 {
 	int ret_val;
@@ -348,13 +380,52 @@ int flash_drive_reset()
 	ret_val=libusb_reset_device(devh);
 
 	return ret_val;
-}
+}/* End flash_drive_reset() */
+/*****************************************************************************************************************/
 
-// MaxLUN should be read by using USB control transfer, there is no SCSI command.
-// MaxLUN if zero then LUN not supported.
-// if MaxLUN is one then the LUN no is zero
-// if MaxLUN is n then the LUN no is from zero to (n-1)
-// LUN numbers should be from 0 to 15 as per USB Mass Storage specification
+/**
+ * Resets the flash drive maually using a USB control transfer.
+ * 
+ * @return  Error codes/Success
+ */
+uint8_t flash_drive_reset_manual(void)
+{
+	int ErrorCode;
+	// For getting maximum LUN, we need to send a control transfer as per USB Mass Storage Bulk Only Specification 1.0 section 3.2
+	// Taking Interface (USB) = Index (libusb_control_transfer) = 0
+	ErrorCode=libusb_control_transfer(devh,	RESET_CONTROL_REQUEST_TYPE, RESET_CONTROL_REQUEST, RESET_CONTROL_VALUE, 0,
+	0, RESET_CONTROL_LENGTH, CONTROL_TIMEOUT);
+	
+	// if return value is less than zero, then Error.
+	// if zero then successful.
+	if(ErrorCode < 0)
+	{
+		#ifdef DEBUG_FLASH_DRIVE
+		printf("\nReset Error.\n");
+		#endif
+	}
+
+	return ErrorCode;
+
+}/* End flash_drive_reset_manual() */
+/*****************************************************************************************************************/
+
+/**
+ * Gets the Maximum Logical Unit Number(LUN) from USB flash drive. 
+ * As per USB Mass Storage Bulk only specification, USB host should do a control transfer 
+ * if it needs to know the LUN of flash drive, there is no SCSI command.
+ *
+ * About the Maximum LUN returned by USB flash drive:
+ * 
+ * 1> if MaxLUN is zero, then LUN not supported.
+ * 
+ * 2> if MaxLUN is one then the LUN in flash drive is zero
+ * 
+ * 3> if MaxLUN is n then the LUN in flash drive is from zero to (n-1). (Maximum value of n is 0x10 or 16)
+ * 
+ * @param  MaxLUN 	Data pointer where to store the MAXLUN after receiving it by control transfer. (LUN numbers should be from 0 to 15 as per USB Mass Storage specification)
+ * @return        	Error codes/Success
+ */
 int flash_drive_GetMaxLUN(uint8_t *MaxLUN)
 {
 	int ErrorCode;
@@ -373,5 +444,6 @@ int flash_drive_GetMaxLUN(uint8_t *MaxLUN)
 	}
 
 	return ErrorCode;
-	
-}
+
+}/* End flash_drive_GetMaxLUN() */
+/****************************************************************************************************************/
