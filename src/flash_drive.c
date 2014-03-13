@@ -303,7 +303,7 @@ int flash_drive_deinit()
 int flash_drive_send_data(unsigned char *data_ptr, int no_of_bytes)
 {
 	int ret_val;
-	int actual_length=2;
+	int actual_length=123;	//garbage value
 
 	// transfer the data to ENDPOINT OUT using USB Bulk Transfer.
 	ret_val=libusb_bulk_transfer(devh, BULK_ONLY_DEFAULT_ENDPOINT_OUT, data_ptr, no_of_bytes, &actual_length, OUT_TIMEOUT);

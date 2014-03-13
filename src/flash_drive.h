@@ -18,6 +18,38 @@
 #define FLASH_DRIVE_DEINIT_SUCCESS							0
 #define FLASH_DRIVE_DEINIT_ERR_REATTACH_KERNEL_DRIVER		1
 
+// Error returned by flash_drive_send_data(). It actually returns errors codes which are returned by libusb functions, but positive number.
+#define FLASH_DRIVE_SEND_ERR_SUCCESS						0 	/** Success */
+#define FLASH_DRIVE_SEND_ERR_IO								1 	/** Input/output error */
+#define FLASH_DRIVE_SEND_ERR_INVALID_PARAM					2	/** Invalid parameter */
+#define FLASH_DRIVE_SEND_ERR_ACCESS							3	/** Access denied (insufficient permissions) */
+#define FLASH_DRIVE_SEND_ERR_NO_DEVICE						4	/** No such device (it may have been disconnected) */
+#define FLASH_DRIVE_SEND_ERR_NOT_FOUND						5	/** Entity not found */
+#define FLASH_DRIVE_SEND_ERR_BUSY							6		/** Resource busy */
+#define FLASH_DRIVE_SEND_ERR_TIMEOUT						7	/** Operation timed out */
+#define FLASH_DRIVE_SEND_ERR_OVERFLOW						8	/** Overflow */
+#define FLASH_DRIVE_SEND_ERR_PIPE							9	/** Pipe error */
+#define FLASH_DRIVE_SEND_ERR_INTERRUPTED					10	/** System call interrupted (perhaps due to signal) */
+#define FLASH_DRIVE_SEND_ERR_NO_MEM							11	/** Insufficient memory */
+#define FLASH_DRIVE_SEND_ERR_NOT_SUPPORTED					12	/** Operation not supported or unimplemented on this platform */
+#define FLASH_DRIVE_SEND_ERR_OTHER							99	/** Other error */
+
+// Error returned by flash_drive_receive_data(). It actually returns errors which are returned by libusb functions, but positive number.
+#define FLASH_DRIVE_RECEIVE_ERR_SUCCESS							0 	/** Success */
+#define FLASH_DRIVE_RECEIVE_ERR_IO								1 	/** Input/output error */
+#define FLASH_DRIVE_RECEIVE_ERR_INVALID_PARAM					2	/** Invalid parameter */
+#define FLASH_DRIVE_RECEIVE_ERR_ACCESS							3	/** Access denied (insufficient permissions) */
+#define FLASH_DRIVE_RECEIVE_ERR_NO_DEVICE						4	/** No such device (it may have been disconnected) */
+#define FLASH_DRIVE_RECEIVE_ERR_NOT_FOUND						5	/** Entity not found */
+#define FLASH_DRIVE_RECEIVE_ERR_BUSY							6		/** Resource busy */
+#define FLASH_DRIVE_RECEIVE_ERR_TIMEOUT							7	/** Operation timed out */
+#define FLASH_DRIVE_RECEIVE_ERR_OVERFLOW						8	/** Overflow */
+#define FLASH_DRIVE_RECEIVE_ERR_PIPE							9	/** Pipe error */
+#define FLASH_DRIVE_RECEIVE_ERR_INTERRUPTED						10	/** System call interrupted (perhaps due to signal) */
+#define FLASH_DRIVE_RECEIVE_ERR_NO_MEM							11	/** Insufficient memory */
+#define FLASH_DRIVE_RECEIVE_ERR_NOT_SUPPORTED					12	/** Operation not supported or unimplemented on this platform */
+#define FLASH_DRIVE_RECEIVE_ERR_OTHER							99	/** Other error */
+
 // DEFAULT values for Descriptor of USB flash drive (For BULK ONLY USB TRANSFER)
 #define BULK_ONLY_DEFAULT_CONFIGURATION_VALUE	 			1
 #define BULK_ONLY_DEFAULT_ENDPOINT_IN 						0x81
