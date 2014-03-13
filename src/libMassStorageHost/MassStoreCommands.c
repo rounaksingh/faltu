@@ -82,9 +82,9 @@ static uint8_t MassStore_SendCommand(CommandBlockWrapper_t* SCSICommandBlock, vo
 	#endif
 
 	ErrorCode = flash_drive_send_data((unsigned char *)SCSICommandBlock, sizeof(CommandBlockWrapper_t));
-	if(ErrorCode<0)
+	if(ErrorCode > 0)
 		return ErrorCode;
-	
+
 	// Send data if any
 	if ((BufferPtr != NULL) && ((ErrorCode = MassStore_SendReceiveData(SCSICommandBlock, BufferPtr)) != 0))
 	{
@@ -114,13 +114,17 @@ static uint8_t MassStore_SendReceiveData(CommandBlockWrapper_t* SCSICommandBlock
 	if (SCSICommandBlock->Flags & COMMAND_DIRECTION_DATA_IN)
 	{
 		ErrorCode = flash_drive_receive_data(BufferPtr, BytesRem, &actual_no_received);
-		if(ErrorCode<0 && (BytesRem == actual_no_received))
-			return ErrorCode;
+		if(ErrorCode > 0)
+			return ErrorCode;		// return Errorcode 
+
+		// Here we know that the received number of bytes must be BytesRem. Since it is sent in the CBW.
+		if(BytesRem != actual_no_received)
+			return 120;				// Error 120 --- ERROR CODE: actual_no_received not equal to desired BytesRem
 	}
 	else
 	{
 		ErrorCode = flash_drive_send_data(BufferPtr, BytesRem);
-		if(ErrorCode<0)		
+		if(ErrorCode > 0)
 			return ErrorCode;
 	}
 	

@@ -90,7 +90,7 @@ out:
  * 
  * @return  Errors/Success (For more info on Errors, Please refer the flash_drive.h file)
  */
-int flash_drive_init(void)
+uint8_t flash_drive_init(void)
 {
 	int ret_val;
 	SCSI_Inquiry_Response_t req_sense_res;
@@ -248,9 +248,9 @@ int flash_drive_init(void)
  * 
  * @return Errors/Success (For more info on Errors, Please refer the flash_drive.h file)
  */
-int flash_drive_deinit()
+uint8_t flash_drive_deinit()
 {
-	int ret_val=0;
+	int ret_val = FLASH_DRIVE_DEINIT_SUCCESS;
 
 	// release the interface zero if claimed.
 	ret_val=libusb_release_interface(devh, BULK_ONLY_DEFAULT_INTERFACE_NUMBER);
@@ -286,7 +286,7 @@ int flash_drive_deinit()
 
 	libusb_exit(NULL);
 	
-	return FLASH_DRIVE_DEINIT_SUCCESS;
+	return (uint8_t) ret_val;
 }/* End flash_drive_deinit() */
 /*****************************************************************************************************************/
 
@@ -300,7 +300,7 @@ int flash_drive_deinit()
  * @param  no_of_bytes Number of bytes in data buffer
  * @return             Errors/Success (Refer the flash_drive.h for more information.)
  */
-int flash_drive_send_data(unsigned char *data_ptr, int no_of_bytes)
+uint8_t flash_drive_send_data(unsigned char *data_ptr, int no_of_bytes)
 {
 	int ret_val;
 	int actual_length=123;	//garbage value
@@ -321,10 +321,10 @@ int flash_drive_send_data(unsigned char *data_ptr, int no_of_bytes)
 		#ifdef DEBUG_FLASH_DRIVE
 		printf("\nSend Failure.	%d\n",ret_val);
 		#endif
-		return ret_val;
 	}
 	
-	return 0;
+	// if success then returns zero.
+	return (uint8_t)(-ret_val);
 }/* End flash_drive_send_data() */
 /*****************************************************************************************************************/
 
@@ -339,7 +339,7 @@ int flash_drive_send_data(unsigned char *data_ptr, int no_of_bytes)
  * @param  no_of_actually_received_bytes Number of Actually received bytes
  * @return                               Error code or Success
  */
-int flash_drive_receive_data(unsigned char *data_ptr, int no_of_bytes, int *no_of_actually_received_bytes)
+uint8_t flash_drive_receive_data(unsigned char *data_ptr, int no_of_bytes, int *no_of_actually_received_bytes)
 {
 	int ret_val;
 
@@ -363,7 +363,7 @@ int flash_drive_receive_data(unsigned char *data_ptr, int no_of_bytes, int *no_o
 		#endif
 	}
 
-	return ret_val;
+	return (uint8_t)(-ret_val);
 } /* End flash_drive_receive_data() */
 /*****************************************************************************************************************/
 
@@ -373,13 +373,13 @@ int flash_drive_receive_data(unsigned char *data_ptr, int no_of_bytes, int *no_o
  * 
  * @return Error codes/Success
  */
-int flash_drive_reset()
+uint8_t flash_drive_reset()
 {
 	int ret_val;
 	//reset the device
 	ret_val=libusb_reset_device(devh);
 
-	return ret_val;
+	return (uint8_t)(-ret_val);
 }/* End flash_drive_reset() */
 /*****************************************************************************************************************/
 
@@ -405,7 +405,7 @@ uint8_t flash_drive_reset_manual(void)
 		#endif
 	}
 
-	return ErrorCode;
+	return (uint8_t)(-ErrorCode);
 
 }/* End flash_drive_reset_manual() */
 /*****************************************************************************************************************/
@@ -426,7 +426,7 @@ uint8_t flash_drive_reset_manual(void)
  * @param  MaxLUN 	Data pointer where to store the MAXLUN after receiving it by control transfer. (LUN numbers should be from 0 to 15 as per USB Mass Storage specification)
  * @return        	Error codes/Success
  */
-int flash_drive_GetMaxLUN(uint8_t *MaxLUN)
+uint8_t flash_drive_GetMaxLUN(uint8_t *MaxLUN)
 {
 	int ErrorCode;
 	// For getting maximum LUN, we need to send a control transfer as per USB Mass Storage Bulk Only Specification 1.0 section 3.2
@@ -434,7 +434,8 @@ int flash_drive_GetMaxLUN(uint8_t *MaxLUN)
 	ErrorCode=libusb_control_transfer(devh,	GETMAXLUN_CONTROL_REQUEST_TYPE, GETMAXLUN_CONTROL_REQUEST, GETMAXLUN_CONTROL_VALUE, 0,
 	MaxLUN, GETMAXLUN_CONTROL_LENGTH, CONTROL_TIMEOUT);
 	
-	// if GET MAX LUN returns 0 means successful and if MaxLUNIndex is zero means media controller has STALL
+	// if libusb_control_transfer returns 0 means successful 
+	// and if MaxLUNIndex is zero means media controller has STALL (as per USB Mass Storage Bulk only specification)
 	// therefore clear STALL or Endpoint halt 
 	if (ErrorCode == 0 && *MaxLUN==0)
 	{
@@ -443,7 +444,7 @@ int flash_drive_GetMaxLUN(uint8_t *MaxLUN)
 		ErrorCode = libusb_clear_halt(devh, 0);
 	}
 
-	return ErrorCode;
+	return (uint8_t)(-ErrorCode);
 
 }/* End flash_drive_GetMaxLUN() */
 /****************************************************************************************************************/

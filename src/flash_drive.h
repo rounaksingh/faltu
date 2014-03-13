@@ -78,11 +78,12 @@
 #define GETMAXLUN_CONTROL_LENGTH 			0x01
 #define GETMAXLUN_RESPONSE_DATA_LENGTH		0x01
 
-int flash_drive_init(void);
-int flash_drive_deinit(void);
-int flash_drive_send_data(unsigned char *data_ptr, int no_of_bytes);
-int flash_drive_receive_data(unsigned char *data_ptr, int no_of_bytes, int *no_of_actually_transferred_bytes);
-int flash_drive_reset();
-int flash_drive_GetMaxLUN(uint8_t *MaxLUN);
+uint8_t flash_drive_init(void);
+uint8_t flash_drive_deinit(void);
+uint8_t flash_drive_send_data(unsigned char *data_ptr, int no_of_bytes);
+uint8_t flash_drive_receive_data(unsigned char *data_ptr, int no_of_bytes, int *no_of_actually_transferred_bytes);
+uint8_t flash_drive_reset();
+uint8_t flash_drive_reset_manual(void);
+uint8_t flash_drive_GetMaxLUN(uint8_t *MaxLUN);
 
 #endif

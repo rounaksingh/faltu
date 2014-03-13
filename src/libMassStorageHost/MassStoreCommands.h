@@ -37,20 +37,15 @@
 #define _MASS_STORE_COMMANDS_H_
 
 	/* Includes: */
-		// #include <avr/io.h>
-
-		// #include "MassStorageHost.h"
 		#include "SCSI_Codes.h"
  		#include <inttypes.h>
  		#include <stdio.h>
  		#include "stdbool.h"
 
  		#include <stddef.h>
-		// #include <LUFA/Drivers/USB/USB.h>
+	
 
 	/* Macros: */
- 	// value for NULL
- 	//#define NULL 0
 
 		/** Class specific request to reset the Mass Storage interface of the attached device */
 		#define REQ_MassStorageReset                0xFF
