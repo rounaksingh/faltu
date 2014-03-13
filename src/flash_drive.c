@@ -32,7 +32,7 @@
 // The pointer to libusb device handle. This variable is internal to flash_drive.c
 static struct libusb_device_handle *devh = NULL;
 // variable to save the info about the attached kernel driver to interface of the device.
-uint8_t active_kernel_driver=0;
+static uint8_t active_kernel_driver=0;
 
 /**
  * Opens a USB flash device using its Vendor ID and Product ID. 
