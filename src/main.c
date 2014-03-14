@@ -6,6 +6,7 @@
 #include <inttypes.h>
 #include <signal.h>
 #include <stdlib.h>
+#include <time.h>
 #include "ff.h"
 #include "diskio.h"
 
@@ -45,6 +46,38 @@ void die (		/* Stop with dying message */
 	signal_callback_handler(1000);
 }
 
+
+/*---------------------------------------------------------*/
+/* User Provided Timer Function for FatFs module           */
+/*---------------------------------------------------------*/
+
+DWORD get_fattime (void)
+{
+	time_t rawtime;
+	struct tm * timeinfo;
+
+	time ( &rawtime );
+	timeinfo = localtime ( &rawtime );
+
+	// Testing functions for time
+	// printf ( "Current local time and date: %s", asctime (timeinfo) );
+	// printf("Year: %d",timeinfo->tm_year-80);
+		// printf("MOnth: %d",timeinfo->tm_mon);
+		// printf("Day: %d",timeinfo->tm_mday);
+		// printf("Hour: %d",timeinfo->tm_hour);
+
+	// get the system time and accordingly return
+	return	  ((DWORD)(timeinfo->tm_year-80) << 25)			// we need year like (current_year - 1980). 
+															//so the system returns tm_year with reference to 1990. that is (current - 1900). 
+															//Therefore, we are subtracting 80 from system time.
+															// for more information, Please read the struct tm in time.h 
+			| ((DWORD)(timeinfo->tm_mon+1) << 21)			// Months system returns [0-11]
+			| ((DWORD)timeinfo->tm_mday << 16) 				// days system returns [1-31]
+			| ((DWORD)timeinfo->tm_hour << 11)				// hour system returns [0-23]
+			| ((DWORD)timeinfo->tm_min << 5)				// min 	system returns [0-59]
+			| ((DWORD)timeinfo->tm_sec >> 1);				// seconds system returns [0-59]
+}
+
 /*-----------------------------------------------------------------------*/
 /* Program Main                                                          */
 /*-----------------------------------------------------------------------*/
@@ -72,7 +105,7 @@ int main (void)
 	printf("\nMount a volume.\n");
 	rc = f_mount(&fatfs, "", 0);	/* Give a work area to the default drive */
 	if (rc) die(rc);
-
+	
 	printf("\nOpen a test file (message.txt).\n");
 
 	// open an existing file with read access
@@ -138,16 +171,3 @@ int main (void)
 
 
 
-/*---------------------------------------------------------*/
-/* User Provided Timer Function for FatFs module           */
-/*---------------------------------------------------------*/
-
-DWORD get_fattime (void)
-{
-	return	  ((DWORD)(2010 - 1980) << 25)	/* Fixed to Jan. 1, 2010 */
-			| ((DWORD)1 << 21)
-			| ((DWORD)1 << 16)
-			| ((DWORD)0 << 11)
-			| ((DWORD)0 << 5)
-			| ((DWORD)0 >> 1);
-}
