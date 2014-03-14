@@ -1,7 +1,7 @@
 # faltu
-The project is a Beginner's level libusb program for sending and receiving SCSI commands to USB mass storage device that is USB flash drive. The program uses libusb for communicating with the USB device in USB layer. It implement the SCSI command library from the LUFA Library by Dean Camera, and Petit FATfs by ChaN. Now the aim of this program is to provide a beginner with basic knowledge of libusb(USB), SCSI commands and FAT filesystem for communicating with a USB flash drive, here communicating means reading, writing a file or folder in the USB flash drive. As a beginner I myself, while implementing a file reading project, experienced a lot of problems, since the three USB, SCSI commands and FAT filesystem are totally exclusive topics. 
+The project is a **Beginner's level libusb program for sending and receiving SCSI commands to USB mass storage device** that is USB flash drive. The program uses **libusb** for communicating with the USB device in USB layer. It implement the SCSI command library from the **LUFA Library by Dean Camera**, and **FATfs by ChaN**. Now the aim of program is to provide a beginner with basic knowledge of libusb(USB), SCSI commands and FAT filesystem for communicating with a USB flash drive, here communicating means reading, writing a file or folder in the USB flash drive. As a beginner I myself, while implementing a file reading project, experienced a lot of problems, since the three USB, SCSI commands and FAT filesystem are totally exclusive topics, it is not easy job to mix them.
 
-So, finding information for all in one place(or thing) is rare. The one of the rare place(or thing) is book USB Mass Storage by Jan Axelson. The book is a Bible for a person learning "How to interface with USB Mass Storage"? though it has no information about interfacing libusb. For information about libusb, anyone can read the forums which contains huge amount of reading materials.
+So, finding information for all in one place(or thing) is rare. The one of the rarest place(or destination of search engine journey) is book **USB Mass Storage by Jan Axelson**. The book is a Bible for a person learning "How to interface with USB Mass Storage"? though it has no information about interfacing libusb. For information about libusb, anyone can read the libusb forums which contains huge amount of reading materials.
 
 Let's start with some introduction to all the important things we need to learn about, before using the faltu...
 
@@ -17,31 +17,23 @@ Now coming to the basic design of the program, that is required to communicate w
 
 ![Block diagram showing the different protocols required.](https://docs.google.com/drawings/d/1ULt5r62bR9rdLrx0l5VQ5kh6L-N4IdeHjZTlaNEqLBQ/pub?w=495&h=751 "Block Diagram of Project")
 
-1. FAT filesystem library: 
+1. **FAT filesystem library**: 
 
 The FAT layer manages the files and folders of the filesystem. It basically maintains File Allocation Tables (oh yeah that's the full form of FAT). This tables are nothing but a specific memory location on the disk where the memory locations of files and folders are stored. FAT filesystem are introduced around 70s-80s as a filesystem when there were no like protocols. The Microsoft took it from its initial form and goes on adding new features, removing bugs trying to make it a nice filesystem. But as the size of the storage devices goes on waxing, the FAT filesystem waned. Now, the FAT filesystem is a primitive filesystem though we use it day today in USB flash devices, SD memory cards, and other similar memory storage devices. 
 
 The FAT filesystem started with the FAT 8, then FAT12, FAT16 and now FAT32. Now there are reasons and drawbacks which made the professionals reluctant to advance to FAT64. And therefore they changed the whole filesystem format and moved to others formats like NTFS, ext2, ext3, ext4. Now, I am not going to explain about the drawbacks and why professionals do not love it, because after reading something about it you will understand, just search about drawbacks of FAT on some decent and fancy search engines.
 
-Here I am not going into the depths of FAT filesystem, though I will give you some reference where you can find the details in simple words. There are tutorials about FAT filesystem on the web, links are given below.
+Here I am not going into the depths of FAT filesystem, though I will give you some reference where you can find the details in simple words. There are tutorials about FAT filesystem on the web, links are given in Reference section.
 
-* ![Lakeview Research -- Mass Storage](http://www.lvr.com/mass_storage.htm)
-* ![Understanding FAT32 Filesystems](http://www.pjrc.com/tech/8051/ide/fat32.html)
-* ![The FAT File Systems](http://www.ntfs.com/fat-systems.htm)
-* ![Home Page for FATfs](http://elm-chan.org/fsw/ff/00index_e.html)
-
-2. SCSI Commands:
+2. **SCSI Commands**:
 
 SCSI commands originated as a protocol for devices that use the "Small Computer Systems Interface" (SCSI) parallel interface. The commands provide a framework for obtaining information from a storage device, controlling the device’s operation, and reading and writing blocks of data in the storage media. The SCSI commands are standarized by technical committee of T10. Also, the USB-IF has provided a specification (with the help of T10), the specification is released under the class of "USB Mass Storage" with name "UFI command specification". 
 
 The UFI specification from USB-IF consisits of a list of SCSI commands, with full detail and sequence of command, which can be implemented for USB flash drive. The specification uses a simple and easily understandable which can be helpful to persons who have an intermediate level knowledge of the USB 2.0 specification (or just how the USB works and how the communication takes place between USB host and USB device).
 
-Please download the specifications for USB Mass Storage class from the link below.
+Please download the specifications for USB Mass Storage class from the link in Reference section.
 
-* ![USB.org developers download section](http://www.usb.org/developers/devclass_docs)
-
-
-3. Universal Serial Bus (USB)
+3. **Universal Serial Bus (USB)**:
 
 The USB is a serial communication protocol, defined with an aim to provide every possible ease and flexiblity to the end-user only. The USB is now-a-days is also one of the popular protocol, that can be used with a wide range of devices for data communication. The major part of USB is not the use but implementation, because of its aim, the whole burden is on the developer and device. Developer need to do the rough work of implementation, so that the end user can use it easily.
 
@@ -49,11 +41,7 @@ To begin with, USB is a host-controlled bus communication, that means there is j
 
 Please read the wiki with the project. Also, I would like to recommend USB Mass Storage book by Jan Axelson. The book explains the introduction of USB, details about the SCSI commands and FAT filesystem; it is basically everything for a beginner to start with. Moreover, if you want to learn USB protocol in depth you can refer to USB Complete by the same author. It is good to read a book before reading a specification directly, since reading specification directly at first seems confusing and sometimes, blow one's mind (as it blowed mine at first). I am not going to recommend specification, at first, to a beginner.
 
-Lakeview Research is a website (created by Jan Axelson) which has books, links and articles for anything related to USB. It has links to nice projects and articles on the Internet. If you want to do anything with USB, I would ask you to just pay a visit to this site.
-
-* ![Lakeview Research -- USB](http://www.lvr.com/usb.htm)
-* ![Lakeview Research -- Mass Storage](http://www.lvr.com/mass_storage.htm)
-* ![USB.org developers download section](http://www.usb.org/developers/devclass_docs)
+**Lakeview Research** is a website (created by Jan Axelson) which has books, links and articles for anything related to USB. It has links to nice projects and articles on the Internet. If you want to do anything with USB, I would ask you to just pay a visit to this site. Link is provided in the Reference section.
 
 ## About the Project
 The project consists of source files (in folder src) and a Makefile. Just clone the project and change to faltu directory and do a "make main" or "make all", to compile the project. To clean the compiled and build documents, do a make clean. "How to compile the project" is expained below.
@@ -64,7 +52,7 @@ The Platform for compiling and running the program is linux based OS that is deb
 ### Dependencies:
 Project depends on:
 
-1. libusb library version 1.0.8 or later: 
+1. **libusb library version 1.0.8 or later**: 
 
 To download and install the library and development packages, please use the source respository and download using apt or yum facility. 
 
@@ -73,7 +61,7 @@ To download and install the library and development packages, please use the sou
 	sudo apt-get install libusb-1.0-0-dev
 This command when run terminal download the development packages and binary library required for compiling and running the program.
 
-2. gcc version 4 or later
+2. **gcc version 4 or later**:
 
 ### What things are required other than Software dependencies
 As a primary requirement, we need a USB flash drive. Also, the computer on which you want to run 
@@ -118,5 +106,23 @@ From project folder, run:
 ### Brief about Errors
 
 ##References:
-links are provided with the text.
+1. libusb
 
+* [Home Page of libusb](http://libusb.org/)
+* [Documentations of APIs of libusb](http://libusb.sourceforge.net/api-1.0/index.html)
+
+2. USB
+
+* [Lakeview Research -- USB](http://www.lvr.com/usb.htm)
+* [Lakeview Research -- Mass Storage](http://www.lvr.com/mass_storage.htm)
+* [USB.org developers download section](http://www.usb.org/developers/devclass_docs)
+
+3. FAT filesystem
+
+* [Lakeview Research -- Mass Storage](http://www.lvr.com/mass_storage.htm)
+* [Understanding FAT32 Filesystems](http://www.pjrc.com/tech/8051/ide/fat32.html)
+* [The FAT File Systems](http://www.ntfs.com/fat-systems.htm)
+* [Home Page for FATfs](http://elm-chan.org/fsw/ff/00index_e.html)
+
+4. SCSI commands
+* [USB.org developers download section](http://www.usb.org/developers/devclass_docs)
