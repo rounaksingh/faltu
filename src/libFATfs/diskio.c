@@ -55,9 +55,16 @@ DSTATUS disk_status (
 
 	if(pdrv == 0)
 	{
-		// write status code
-	}
+		// get status code (for now we can extend it afterward... need to think about it..)
+		// Also need to think about the write protect detection using Request Sense SCSI command.
+		if(!MassStore_TestUnitReady(0))
+			return STA_NODISK;
 
+		// return success if return value from the MassStore_TestUnitReady() is zero
+		return	STA_INIT_SUCCESS;
+
+	}
+	// 
 	return STA_NOINIT;
 }
 
@@ -136,9 +143,6 @@ DRESULT disk_write (
 	
 	if(pdrv == 0)
 	{
-		if(MassStore_TestUnitReady(0))
-			return RES_NOTRDY;
-
 		// write the sector
 		result = MassStore_WriteDeviceBlock(BULK_ONLY_DEFAULT_LUN_NUMBER, sector, count, 512, buff);
 		if(result > 0)
