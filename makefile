@@ -12,9 +12,9 @@ SRCEXT := c
 
 #SOURCES := $(shell find $(SRCDIR) -type f -name *.$(SRCEXT))
 #
-SRC = main.c libPFF/diskio.c libPFF/pff.c libMassStorageHost/MassStoreCommands.c libMassStorageHost/print_struct.c
+SRC = main.c libMassStorageHost/MassStoreCommands.c libMassStorageHost/print_struct.c
 
-EXTRAINCDIRS = src src/libMassStorageHost src/libPFF
+EXTRAINCDIRS = src src/libMassStorageHost
 
 LIBUSB_DIR = /usr/local/lib
 

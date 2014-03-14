@@ -1,16 +1,14 @@
-/*----------------------------------------------------------------------*/
-/* Petit FatFs sample project for generic uC  (C)ChaN, 2010             */
-/*----------------------------------------------------------------------*/
-
+/**
+ *
+ * 
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
 #include <malloc.h>
-#include <unistd.h>
 #include <signal.h>
 #include "main.h"
 #include "libusb.h"
-#include "pff.h"
 #include "MassStoreCommands.h"
 #include "print_struct.h"
 
@@ -24,30 +22,6 @@
 struct libusb_device_handle *devh = NULL;
 int active_kernel_driver=0;
 uint8_t *buffer;
-
-/*Functions for pff*/
-void die (		/* Stop with dying message */
-	FRESULT rc	/* FatFs return value */
-)
-{
-	printf("Failed with rc=%u.\n", rc);
-	for (;;) ;
-}
-
-/*---------------------------------------------------------*/
-/* User Provided Timer Function for FatFs module           */
-/*---------------------------------------------------------*/
-
-DWORD get_fattime (void)
-{
-	return	  ((DWORD)(2010 - 1980) << 25)	/* Fixed to Jan. 1, 2010 */
-			| ((DWORD)1 << 21)
-			| ((DWORD)1 << 16)
-			| ((DWORD)0 << 11)
-			| ((DWORD)0 << 5)
-			| ((DWORD)0 >> 1);
-}
-
 
 /***********************************************************************************************/
 /*LIBUSB related functions*/
@@ -219,14 +193,13 @@ int flash_drive_send_data(unsigned char *data_ptr, int no_of_bytes)
 	int r;
 	int actual_length=2;
 
-	r=libusb_bulk_transfer(devh, BULK_ENDPOINT_OUT, data_ptr, no_of_bytes, &actual_length, OUT_TIMEOUT);	//Endpoint No:1 Data: data_ptr
-	if(r<0)											//length :2 *actual_length=2
-	{												//Timeout=0
+	r=libusb_bulk_transfer(devh, BULK_ENDPOINT_OUT, data_ptr, no_of_bytes, &actual_length, OUT_TIMEOUT);
+	if(r<0)
+	{
 		printf("\nSend Failure.	%d\n",r);
 
 		return r;
 	}
-
 	else
 	{
 		printf("\nSend Complete. %d  %d\n",no_of_bytes, actual_length);	
@@ -242,7 +215,6 @@ int flash_drive_receive_data(unsigned char *data_ptr, int no_of_bytes, int *no_o
 
 	while(retry)
 		{
-			usleep(1000000);
 			printf("Retry %d",retry);
 			r=libusb_bulk_transfer(devh, BULK_ENDPOINT_IN, data_ptr, no_of_bytes, no_of_actually_received_bytes, IN_TIMEOUT);	
 			if(r==-9)
@@ -337,7 +309,6 @@ int main (void)
 		}
 
 		// Data Transfer function
-//		flash_drive_transfer_data(devh);
 		r=MassStore_Inquiry(0, &req_sense_res );
 		if(r<0)
 		{
@@ -361,8 +332,6 @@ int main (void)
 					printf("Mass Storage Ready.\n");
 
 				}
-
-				usleep(2000000);
 			}
 			
 			printf("\nReading Capacity of Mass Storage device (LUN=0):\n");
@@ -428,64 +397,4 @@ int main (void)
 
 	flash_drive_deinit();
 	return 0;
-/*	FATFS fatfs;			 // File system object 
-	DIR dir;				 // Directory object 
-	FILINFO fno;			 // File information object
-	WORD bw, br, i;
-	BYTE buff[64];
-	FRESULT rc;
-
-	printf("\nMount a volume.\n");
-	rc = pf_mount(&fatfs);
-	if (rc) die(rc);
-
-	printf("\nOpen a test file (message.txt).\n");
-	rc = pf_open("MESSAGE.TXT");
-	if (rc) die(rc);
-
-	printf("\nType the file content.\n");
-	for (;;) {
-		rc = pf_read(buff, sizeof(buff), &br);	// Read a chunk of file
-		if (rc || !br) break;					// Error or end of file
-		for (i = 0; i < br; i++)				// Type the data 
-			putchar(buff[i]);
-	}
-	if (rc) die(rc);
-
-#if _USE_WRITE
-	printf("\nOpen a file to write (write.txt).\n");
-	rc = pf_open("WRITE.TXT");
-	if (rc) die(rc);
-
-	printf("\nWrite a text data. (Hello world!)\n");
-	for (;;) {
-		rc = pf_write("Hello world!\r\n", 14, &bw);
-		if (rc || !bw) break;
-	}
-	if (rc) die(rc);
-
-	printf("\nTerminate the file write process.\n");
-	rc = pf_write(0, 0, &bw);
-	if (rc) die(rc);
-#endif
-
-#if _USE_DIR
-	printf("\nOpen root directory.\n");
-	rc = pf_opendir(&dir, "");
-	if (rc) die(rc);
-
-	printf("\nDirectory listing...\n");
-	for (;;) {
-		rc = pf_readdir(&dir, &fno);	 // Read a directory item 
-		if (rc || !fno.fname[0]) break;	 // Error or end of dir 
-		if (fno.fattrib & AM_DIR)
-			printf("   <dir>  %s\n", fno.fname);
-		else
-			printf("%8lu  %s\n", fno.fsize, fno.fname);
-	}
-	if (rc) die(rc);
-#endif
-
-	printf("\nTest completed.\n");
-	for (;;) ;*/
 }
