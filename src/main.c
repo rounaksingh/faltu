@@ -70,7 +70,7 @@ int main (void)
 	UINT bw, br;
 
 	printf("\nMount a volume.\n");
-	rc = f_mount(&fatfs, "", 1);	/* Give a work area to the default drive */
+	rc = f_mount(&fatfs, "", 0);	/* Give a work area to the default drive */
 	if (rc) die(rc);
 
 	printf("\nOpen a test file (message.txt).\n");

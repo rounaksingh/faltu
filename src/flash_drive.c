@@ -147,6 +147,7 @@ uint8_t flash_drive_init(void)
 	else
 	{
 		printf("\nCould not check the kernel_driver_active Error: %d.\n", ret_val);
+		active_kernel_driver=0;
 		return FLASH_DRIVE_INIT_ERR_LIBUSB_KERNEL_ACTIVE;
 	}
 
