@@ -1,4 +1,4 @@
-#faltu
+# faltu
 The project is a Beginner's level libusb program for sending and receiving SCSI commands to USB mass storage device that is USB flash drive. The program uses libusb for communicating with the USB device in USB layer. It implement the SCSI command library from the LUFA Library by Dean Camera, and Petit FATfs by ChaN. Now the aim of this program is to provide a beginner with basic knowledge of libusb(USB), SCSI commands and FAT filesystem for communicating with a USB flash drive, here communicating means reading, writing a file or folder in the USB flash drive. As a beginner I myself, while implementing a file reading project, experienced a lot of problems, since the three USB, SCSI commands and FAT filesystem are totally exclusive topics. 
 
 So, finding information for all in one place(or thing) is rare. The one of the rare place(or thing) is book USB Mass Storage by Jan Axelson. The book is a Bible for a person learning "How to interface with USB Mass Storage"? though it has no information about interfacing libusb. For information about libusb, anyone can read the forums which contains huge amount of reading materials.
@@ -12,40 +12,51 @@ When I wrote a simple program for reading/writing from/to USB flash drive, I dec
 
 Readme have just introductory sections about the protocols and in detail explaination about How to use the program for learning purpose. If you want to read the protocols in *some more details please do read the wikis* with the project.
 
-##Modules
-Now coming to the macro-scale design of the program, which is required to communicate with a USB flash device. For software part, there are three layers which are namely USB host controller driver, SCSI command genrator & SCSI response parser, and filesystem format. Actually the division is on the basis of different protocols, which needs to come together to acomplish our aim, that are USB, SCSI commands and FAT filesystem. Because of mingling of three protocol, the project implementing USB flash devices becomes complicated. Now, below I am providing a visual input for you...
+## Basic Design of program
+Now coming to the basic design of the program, that is required to communicate with a USB flash device. For software part, there are three layers which are namely USB host controller driver, SCSI command genrator & SCSI response parser, and filesystem format. Actually the division is on the basis of different protocols, which needs to come together to acomplish our aim, that are USB, SCSI commands and FAT filesystem. Because of mingling of three protocol, the project implementing USB flash devices becomes complicated. Now, below I am providing a visual input for you...
 
-				 ___________________________________________________________________
-				|																	|
-				|						Petit FAT filesystem						|
-				|___________________________________________________________________|
-				|																	|
-				|							SCSI Commands							|
-				|___________________________________________________________________|
-				|																	|
-				|							libusb (USB)							|
-				|___________________________________________________________________|
+![Block diagram showing the different protocols required.](https://docs.google.com/drawings/d/1ULt5r62bR9rdLrx0l5VQ5kh6L-N4IdeHjZTlaNEqLBQ/pub?w=495&h=751 "Block Diagram of Project")
 
-1. Petit FAT filesystem module: 
+1. FAT filesystem library: 
 
 The FAT layer manages the files and folders of the filesystem. It basically maintains File Allocation Tables (oh yeah that's the full form of FAT). This tables are nothing but a specific memory location on the disk where the memory locations of files and folders are stored. FAT filesystem are introduced around 70s-80s as a filesystem when there were no like protocols. The Microsoft took it from its initial form and goes on adding new features, removing bugs trying to make it a nice filesystem. But as the size of the storage devices goes on waxing, the FAT filesystem waned. Now, the FAT filesystem is a primitive filesystem though we use it day today in USB flash devices, SD memory cards, and other similar memory storage devices. 
 
 The FAT filesystem started with the FAT 8, then FAT12, FAT16 and now FAT32. Now there are reasons and drawbacks which made the professionals reluctant to advance to FAT64. And therefore they changed the whole filesystem format and moved to others formats like NTFS, ext2, ext3, ext4. Now, I am not going to explain about the drawbacks and why professionals do not love it, because after reading something about it you will understand, just search about drawbacks of FAT on some decent and fancy search engines.
 
-Here I am not going into the depths of FAT filesystem, though I will give you some reference where you can find the details in simple words.
+Here I am not going into the depths of FAT filesystem, though I will give you some reference where you can find the details in simple words. There are tutorials about FAT filesystem on the web, links are given below.
 
+* ![Lakeview Research -- Mass Storage](http://www.lvr.com/mass_storage.htm)
+* ![Understanding FAT32 Filesystems](http://www.pjrc.com/tech/8051/ide/fat32.html)
+* ![The FAT File Systems](http://www.ntfs.com/fat-systems.htm)
+* ![Home Page for FATfs](http://elm-chan.org/fsw/ff/00index_e.html)
 
 2. SCSI Commands:
 
-SCSI commands originated as a protocol for devices that use the Small Computer Systems Interface (SCSI) parallel interface. The commands provide a framework for obtaining information about a storage device, controlling the device’s operation, and reading and writing blocks of data in the storage media. 
+SCSI commands originated as a protocol for devices that use the "Small Computer Systems Interface" (SCSI) parallel interface. The commands provide a framework for obtaining information from a storage device, controlling the device’s operation, and reading and writing blocks of data in the storage media. The SCSI commands are standarized by technical committee of T10. Also, the USB-IF has provided a specification (with the help of T10), the specification is released under the class of "USB Mass Storage" with name "UFI command specification". 
 
-3. USB
+The UFI specification from USB-IF consisits of a list of SCSI commands, with full detail and sequence of command, which can be implemented for USB flash drive. The specification uses a simple and easily understandable which can be helpful to persons who have an intermediate level knowledge of the USB 2.0 specification (or just how the USB works and how the communication takes place between USB host and USB device).
 
-The USB is 
+Please download the specifications for USB Mass Storage class from the link below.
+
+* ![USB.org developers download section](http://www.usb.org/developers/devclass_docs)
 
 
-## How to interface with a USB mass storage device?
-The project consists of a source folder having all source files and a Makefile. Just clone the project and change to faltu directory and do a make main or make all, to compile the project. TO clean the compiled and build documents, do a make clean.
+3. Universal Serial Bus (USB)
+
+The USB is a serial communication protocol, defined with an aim to provide every possible ease and flexiblity to the end-user only. The USB is now-a-days is also one of the popular protocol, that can be used with a wide range of devices for data communication. The major part of USB is not the use but implementation, because of its aim, the whole burden is on the developer and device. Developer need to do the rough work of implementation, so that the end user can use it easily.
+
+To begin with, USB is a host-controlled bus communication, that means there is just one host(master) and several slaves(according to USB specification 2.0, a host can connect to 127 slaves). Now, host is the main player which detect the slave connected, initiate transfers, send/receive data, keeps track of data packets, and other tasks such as attaching a 7-bit address on the bus. For slaves, a specific terminology is used that is "USB devices". The USB devices wait for the host to detect them(enumeration step), also they waits for data transfer, until the host starts transfer. The devices are functions they just do specific functions, while controlled by some higher authority.
+
+Please read the wiki with the project. Also, I would like to recommend USB Mass Storage book by Jan Axelson. The book explains the introduction of USB, details about the SCSI commands and FAT filesystem; it is basically everything for a beginner to start with. Moreover, if you want to learn USB protocol in depth you can refer to USB Complete by the same author. It is good to read a book before reading a specification directly, since reading specification directly at first seems confusing and sometimes, blow one's mind (as it blowed mine at first). I am not going to recommend specification, at first, to a beginner.
+
+Lakeview Research is a website (created by Jan Axelson) which has books, links and articles for anything related to USB. It has links to nice projects and articles on the Internet. If you want to do anything with USB, I would ask you to just pay a visit to this site.
+
+* ![Lakeview Research -- USB](http://www.lvr.com/usb.htm)
+* ![Lakeview Research -- Mass Storage](http://www.lvr.com/mass_storage.htm)
+* ![USB.org developers download section](http://www.usb.org/developers/devclass_docs)
+
+## About the Project
+The project consists of source files (in folder src) and a Makefile. Just clone the project and change to faltu directory and do a "make main" or "make all", to compile the project. To clean the compiled and build documents, do a make clean. "How to compile the project" is expained below.
 
 ### Platform
 The Platform for compiling and running the program is linux based OS that is debian, ubuntu, redhat, fedora, etc. For the project, the platform dependency is because of the requirement of libusb 1.0.8 or later. Since, the libusb 1.0 is not ported for windows, so I am afraid that windows cannot use the program. While all other parts (such as SCSI commands and FAT filesysytem programs) are dependency free. Therefore anyone can port the parts (save libusb) of the program for any other platform.
@@ -107,5 +118,5 @@ From project folder, run:
 ### Brief about Errors
 
 ##References:
-1. 
+links are provided with the text.
 
