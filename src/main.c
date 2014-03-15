@@ -126,41 +126,6 @@ int main (void)
 	if (rc) die(rc);
 	printf("File Read Complete.\n");
 	
-#if _USE_WRITE
-	printf("\nOpen a file to write (write.txt).\n");
-	rc = pf_open("usbmon.txt");
-	if (rc) die(rc);
-
-	printf("\nWrite a text data. (Hello world!)\n");
-	for (;;) {
-		//rc = pf_write("Hello world!\r\n", 14, &bw);
-		rc = pf_write("sdkfglaksdjflkasjdf!\r\n", 22, &bw);
-		if (rc || !bw) break;
-	}
-	if (rc) die(rc);
-
-	rc = pf_write(0, 0, &bw);
-	if (rc) die(rc);
-	printf("\nTerminate the file write process.\n");
-#endif
-
-#if _USE_DIR
-	printf("\nOpen root directory.\n");
-	rc = pf_opendir(&dir, "/USB");
-	if (rc) die(rc);
-
-	printf("\nDirectory listing...\n");
-	for (;;) {
-		rc = pf_readdir(&dir, &fno);	/* Read a directory item */
-		if (rc || !fno.fname[0]) break;	/* Error or end of dir */
-		if (fno.fattrib & AM_DIR)
-			printf("   <dir>  %s\n", fno.fname);
-		else
-			printf("%8lu  %s\n", fno.fsize, fno.fname);
-	}
-	if (rc) die(rc);
-#endif
-
 	printf("\nTest completed.\n");
 
 	disk_deinitialize ();
