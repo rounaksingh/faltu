@@ -47,7 +47,7 @@ The project consists of source files (in folder src) and a Makefile. Just clone 
 The project consists of three branches based on the complexity and level of implementation, below are the names of branches with description:
 
 1. master: 
-	code using FATfs, USB Mass Storage commands and libusb code. The code implements FATfs latest version R0.10a which has a lots of improvements (however most APIs of FATfs are almost compatible in working with Petit FATfs) comparing with the Petit FATfs. However, the improvements increases the complexities for implemention. So, usage of this branch is not recommended to the beginner at first, without having basic knowledge of APIs and 
+	code using FATfs, USB Mass Storage commands and libusb code. The code implements FATfs latest version R0.10a which has a lots of improvements (however most APIs of FATfs are almost compatible in working with Petit FATfs) comparing with the Petit FATfs. However, the improvements increases the complexities for implemention. So, usage of this branch is not recommended to the beginner at first, without having basic knowledge of FATfs APIs.
 
 2. usingPetitFATfs: 
 	code using Petit FATfs(which is small footprint of FAT than FATfs), USB Mass Storage commands and libusb. Petit FATfs implement less features than FATfs, but complexity is less and that's good for a beginner to comprehend the APIs of FATfs. Petit FATfs has some restrictions such as low write features means it can only write to an existing file and cannot create a new file, however it can perform basic functions such as reading a file, listing files and folders under a folder.
