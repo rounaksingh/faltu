@@ -115,6 +115,12 @@ From project folder, run:
 
 	$ sudo ./bin/main 
 
+### BEWARE:
+The project uses the struct defined in MassStoreCommands.h, which uses the attribute((packed)). Now, since the attribute((packed)) are gcc specific, so the program is gcc dependent and can not be build by other compilers without modification. If you want to build the program with other non-gcc compiler then you need to consider the struct alignment and padding for the compiler, also, this can be overcome by using serialization of c structures. In future, we will overcome using tpl serialization library written in C. Moreover, if you build by other compiler but without using the serialization of structures then the program will not work. See thread for problem:
+
+[Thread from libusb forum on problem](http://libusb.6.n5.nabble.com/libusb-bulk-transfer-error-9-Pipe-Halt-at-EndPoint-0x81-while-receiving-data-from-usb-flash-drive-tt5712940.html#none)
+
+
 ##References:
 1. libusb:
 	* [Home Page of libusb](http://libusb.org/)
