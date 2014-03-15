@@ -43,7 +43,7 @@ Now coming to the basic design of the program, that is required to communicate w
 ## About the Project
 The project consists of source files (in folder src) and a Makefile. Just clone the project and change to faltu directory and do a "make main" or "make all", to compile the project. To clean the compiled and build documents, do a make clean. "How to compile the project" is expained below.
 
-### Branches
+### Project Branches
 The project consists of three branches, which have the 
 
 1. master: 
@@ -58,10 +58,13 @@ The project consists of three branches, which have the
 ### Platform
 The Platform for compiling and running the program is linux based OS that is debian, ubuntu, redhat, fedora, etc. For the project, the platform dependency is because of the requirement of libusb 1.0.8 or later. Since, the libusb 1.0 is not ported for windows, so I am afraid that windows cannot use the program. While all other parts (such as SCSI commands and FAT filesysytem programs) are dependency free. Therefore anyone can port the parts (save libusb) of the program for any other platform.
 
-### Dependencies:
+### Project Dependencies:
 Project depends on:
 
-1. **libusb library version 1.0.8 or later**: 
+1. GNU linux OS :
+	The project is based on library and APIs which donot work on the non-linux systems. Therefore the project is dependent on linux.
+
+2. **libusb library version 1.0.8 or later**: 
 	To download and install the library and development packages, please use the source respository and download using apt or yum facility. 
 
 	**Debian and Debian-based OS**
@@ -69,13 +72,14 @@ Project depends on:
 		sudo apt-get install libusb-1.0-0-dev
 	This command when run terminal download the development packages and binary library required for compiling and running the program.
 
-2. **gcc version 4 or later**:
+3. **gcc version 4 or later**: 
+	GCC compiler is required for compiling and building the project.
 
 ### What things are required other than Software dependencies
-As a primary requirement, we need a USB flash drive. Also, the computer on which you want to run 
+As a primary requirement, we need a USB flash drive (Pen drive).
 
 ### How to know the VID and PID of a USB device
-Most of the linux box has "lsusb" as a built-in command to access the list of connected USB devices.
+Most of the linux box has "lsusb" as a built-in command to access the list of connected USB devices. So, connect the USB device and run the command given below.
 
 	$ lsusb
 
@@ -110,8 +114,6 @@ Important Note: If the USB device has not have user level access permission, the
 From project folder, run:
 
 	$ sudo ./bin/main 
-
-### Brief about Errors
 
 ##References:
 1. libusb:
