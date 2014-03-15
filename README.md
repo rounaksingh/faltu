@@ -44,16 +44,16 @@ Now coming to the basic design of the program, that is required to communicate w
 The project consists of source files (in folder src) and a Makefile. Just clone the project and change to faltu directory and do a "make main" or "make all", to compile the project. To clean the compiled and build documents, do a make clean. "How to compile the project" is expained below.
 
 ### Project Branches
-The project consists of three branches, which have the 
+The project consists of three branches based on the complexity and level of implementation, below are the names of branches with description:
 
 1. master: 
-	code using FATfs, USB Mass Storage commands and libusb code. The code implements FATfs latest version R0.10a which has a lots of improvements comparing with the Petit FATfs. However, the improvements increases the complexities for implemention.
+	code using FATfs, USB Mass Storage commands and libusb code. The code implements FATfs latest version R0.10a which has a lots of improvements (however most APIs of FATfs are almost compatible in working with Petit FATfs) comparing with the Petit FATfs. However, the improvements increases the complexities for implemention. So, usage of this branch is not recommended to the beginner at first, without having basic knowledge of APIs and 
 
 2. usingPetitFATfs: 
-	code using Petit FATfs(which is shorter footprint of FAT than FATfs), USB mass Storage commands and libusb code. Petit FATfs also implement less features, but complexity is less and that's good for a beginner. Petit FATfs has some restrictions such as low write features means it can only write to an existing file and cannot create a new file.
+	code using Petit FATfs(which is small footprint of FAT than FATfs), USB Mass Storage commands and libusb. Petit FATfs implement less features than FATfs, but complexity is less and that's good for a beginner to comprehend the APIs of FATfs. Petit FATfs has some restrictions such as low write features means it can only write to an existing file and cannot create a new file, however it can perform basic functions such as reading a file, listing files and folders under a folder.
 
 3. simple_direct_SCSI: 
-	code with no implementation of FAT, but only SCSI commands and libusb to do testing with the lower level of USB flash drive.
+	code with no implementation of FAT filesystem, but only SCSI commands and libusb. This branch can give a feel to the lower level of protocol that is SCSI commands. The user can do testing with the SCSI commands and understand the working of the commands and USB.
 
 ### Platform
 The Platform for compiling and running the program is linux based OS that is debian, ubuntu, redhat, fedora, etc. For the project, the platform dependency is because of the requirement of libusb 1.0.8 or later. Since, the libusb 1.0 is not ported for windows, so I am afraid that windows cannot use the program. While all other parts (such as SCSI commands and FAT filesysytem programs) are dependency free. Therefore anyone can port the parts (save libusb) of the program for any other platform.
